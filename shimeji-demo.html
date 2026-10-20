@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Anunay Shimeji Mascot | Interactive Animation Showcase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #07070f;
+      --paper: #efeadf;
+      --cyan: #3df0ff;
+      --lime: #d4ff3a;
+      --purple: #5b3cff;
+      --orange: #ff4a1c;
+      --pink: #ff3df0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Space Mono', monospace;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Fullscreen Showcase Canvas */
+    #showcase-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 40%, #161036 0%, #07070f 75%);
+    }
+
+    /* Top HUD */
+    .top-bar {
+      position: fixed;
+      top: 14px;
+      left: 18px;
+      right: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+      pointer-events: none;
+    }
+    .hud-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+    .hud-tag {
+      background: var(--pink);
+      color: #000;
+      font: 700 11px/1 'Space Mono', monospace;
+      padding: 5px 10px;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+    }
+    .hud-title {
+      font: 400 clamp(16px, 2.5vw, 22px)/1 'Archivo Black', Impact, sans-serif;
+      color: #fff;
+      letter-spacing: -0.02em;
+      text-shadow: 2px 2px 0 #000;
+    }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    /* Scene Playlist Bar */
+    .scene-bar {
+      position: fixed;
+      top: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      background: rgba(7, 7, 15, 0.92);
+      border: 2px solid var(--paper);
+      box-shadow: 4px 4px 0 #000;
+      padding: 6px 10px;
+      border-radius: 20px;
+      z-index: 20;
+      backdrop-filter: blur(8px);
+    }
+    .scene-btn {
+      background: #000;
+      color: var(--paper);
+      border: 1px solid #333;
+      padding: 5px 10px;
+      font: 700 10px 'Space Mono', monospace;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .scene-btn:hover {
+      background: var(--cyan);
+      color: #000;
+      border-color: #000;
+      transform: translateY(-1px);
+    }
+    .scene-btn.active {
+      background: var(--lime);
+      color: #000;
+      border-color: #000;
+      box-shadow: 2px 2px 0 var(--cyan);
+    }
+
+    /* Dynamic Feature Explanation Overlay Card */
+    .feature-card {
+      position: fixed;
+      left: 24px;
+      bottom: 84px;
+      max-width: 440px;
+      background: rgba(7, 7, 15, 0.94);
+      border: 3px solid var(--cyan);
+      box-shadow: 6px 6px 0 #000;
+      padding: 16px 20px;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+      transition: all 0.25s ease;
+    }
+    .feature-badge {
+      font: 700 9px 'Space Mono', monospace;
+      color: var(--lime);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feature-badge::before {
+      content: '';
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--lime);
+      border-radius: 50%;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); }
+    }
+    .feature-title {
+      font: 400 18px/1.2 'Archivo Black', Impact, sans-serif;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--paper);
+      opacity: 0.92;
+      margin-bottom: 10px;
+    }
+    .feature-telemetry {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.2);
+      font: 700 9px 'Space Mono', monospace;
+      color: var(--cyan);
+    }
+    .tele-tag {
+      background: rgba(61, 240, 255, 0.12);
+      border: 1px solid rgba(61, 240, 255, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Bottom Control Dock */
+    .dock {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(7, 7, 15, 0.94);
+      border: 3px solid var(--paper);
+      box-shadow: 6px 6px 0 #000;
+      padding: 7px 14px;
+      backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+    .dock-pill {
+      background: #000;
+      color: var(--paper);
+      border: 2px solid #333;
+      padding: 6px 12px;
+      font: 700 10px 'Space Mono', monospace;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+    }
+    .dock-pill:hover {
+      background: var(--cyan);
+      color: #000;
+      border-color: #000;
+      transform: translateY(-2px);
+      box-shadow: 3px 3px 0 #000;
+    }
+    .dock-pill.active {
+      background: var(--lime);
+      color: #000;
+      border-color: #000;
+      box-shadow: 2px 2px 0 var(--cyan);
+    }
+    .back-btn {
+      background: var(--orange);
+      color: #000;
+      border-color: #000;
+    }
+    .back-btn:hover {
+      background: var(--lime);
+    }
+
+    /* Holographic Virtual Mouse Pointer for Demonstration */
+    #virtual-hand {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 100;
+      display: none;
+      transform: translate(-10px, -10px);
+      filter: drop-shadow(0 0 10px var(--cyan));
+      transition: opacity 0.2s ease;
+    }
+    #virtual-hand svg {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="hud-title-wrap">
+      <span class="hud-tag">MASCOT SHOWCASE</span>
+      <h1 class="hud-title">ANUNAY // SHIMEJI ANIMATION REEL</h1>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="dock-pill back-btn">◀ SLIDES (INDEX)</a>
+      <a href="anunay-character.html" class="dock-pill" style="color:var(--cyan)">🎮 ARENA ↗</a>
+    </div>
+  </div>
+
+  <!-- Scene Navigation Rail -->
+  <div class="scene-bar">
+    <button class="scene-btn active" data-scene="0">▶ AUTO TOUR</button>
+    <button class="scene-btn" data-scene="1">1. 🦿 6-STAGE RUN</button>
+    <button class="scene-btn" data-scene="2">2. 🛹 COMBAT SLIDE</button>
+    <button class="scene-btn" data-scene="3">3. 🧗 WALL CLIMB</button>
+    <button class="scene-btn" data-scene="4">4. 🙃 CEILING CRAWL</button>
+    <button class="scene-btn" data-scene="5">5. 🦘 GRAB &amp; FLING</button>
+    <button class="scene-btn" data-scene="6">6. 🐾 CLONE PARTY</button>
+  </div>
+
+  <!-- Feature Annotation Card -->
+  <div class="feature-card" id="feature-card">
+    <div class="feature-badge" id="card-badge">SCENE 1 // RUN KINEMATICS</div>
+    <h2 class="feature-title" id="card-title">6-Stage Cyclic Leg Strides</h2>
+    <p class="feature-desc" id="card-desc">
+      Watch Anunay's legs dynamically alternate through a 6-stage mathematical quadrature cycle: Left heel strike, passing knee, airborne flight push-off, right heel strike, and counterpart passing knee with stride-synchronized dust puffs.
+    </p>
+    <div class="feature-telemetry">
+      <span class="tele-tag" id="tele-surface">SURFACE: GROUND</span>
+      <span class="tele-tag" id="tele-speed">SPEED: 5.2 PX/F</span>
+      <span class="tele-tag" id="tele-state">POSE: RUNNING</span>
+      <span class="tele-tag" id="tele-fps">60 FPS</span>
+    </div>
+  </div>
+
+  <!-- Canvas Stage -->
+  <canvas id="showcase-canvas"></canvas>
+
+  <!-- Holographic Virtual Hand Cursor -->
+  <div id="virtual-hand">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 2L10 18L13.5 14.5L17 22L20 20.5L16.5 13L22 13L10 2Z" fill="#3df0ff" stroke="#000" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- Interactive Sandbox Dock -->
+  <div class="dock">
+    <button class="dock-pill active" id="btn-tour">🎬 AUTO TOUR: ON</button>
+    <button class="dock-pill" id="btn-toss">🦘 FLING / TOSS</button>
+    <button class="dock-pill" id="btn-slide">🛹 SLIDE</button>
+    <button class="dock-pill" id="btn-climb">🧗 CLIMB WALL</button>
+    <button class="dock-pill" id="btn-ceiling">🙃 CEILING</button>
+    <button class="dock-pill" id="btn-shoot">⚡ BLAST BURST</button>
+    <button class="dock-pill" id="btn-clone">➕ CLONE MASCOT</button>
+    <button class="dock-pill active" id="btn-sound">🔊 SOUND</button>
+  </div>
+
+  <script src="anunay-2d.js"></script>
+  <script>
+    const canvas = document.getElementById('showcase-canvas');
+    const ctx = canvas.getContext('2d');
+    const virtualHand = document.getElementById('virtual-hand');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      if (window.mascots) {
+        window.mascots.forEach(m => {
+          m.groundY = canvas.height - 75;
+          m.wallRightX = canvas.width - 86;
+          m.wallLeftX = 86;
+        });
+      }
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Initialize Primary Mascot
+    const mascots = [];
+    function createMascot(x, y, scale = 0.65) {
+      const m = new Anunay2D(canvas, {
+        scale: scale,
+        groundY: canvas.height - 75,
+        isStandalone: true,
+        isShimeji: true,
+        autonomous: false,
+        x: x !== undefined ? x : canvas.width * 0.45,
+        y: y !== undefined ? y : canvas.height - 75
+      });
+      mascots.push(m);
+      return m;
+    }
+
+    const hero = createMascot();
+    window.mascots = mascots;
+    window.hero = hero;
+
+    // SCENE DEMO REEL SYSTEM
+    const SCENES = [
+      {
+        id: 1,
+        name: "6-Stage Cyclic Leg Strides",
+        badge: "SCENE 1 // LEG MOVEMENT",
+        desc: "Watch Anunay's legs dynamically alternate through a 6-stage mathematical quadrature cycle: Left heel strike, passing knee, airborne flight push-off, right heel strike, and counterpart passing knee with stride-synchronized footstep dust.",
+        duration: 5.5,
+        init: () => {
+          hero.surface = 'ground';
+          hero.y = hero.groundY;
+          hero.direction = 1;
+          hero.targetVx = 5.2;
+          hero.state = 'run';
+          virtualHand.style.display = 'none';
+        },
+        update: (t) => {
+          if (hero.x > canvas.width - 200) hero.targetVx = -5.2;
+          if (hero.x < 200) hero.targetVx = 5.2;
+        }
+      },
+      {
+        id: 2,
+        name: "Tactical Combat Slide & Blaster Burst",
+        badge: "SCENE 2 // COMBAT ACTIONS",
+        desc: "Anunay accelerates into a high-speed sprint and drops into a low tactical combat slide with trailing sparks and speed dust streaks, followed by an immediate 3-round laser blast volley!",
+        duration: 5.0,
+        init: () => {
+          hero.surface = 'ground';
+          hero.y = hero.groundY;
+          hero.direction = 1;
+          hero.targetVx = 6.0;
+          hero.state = 'run';
+          virtualHand.style.display = 'none';
+          setTimeout(() => hero.triggerSlide(), 1200);
+          setTimeout(() => hero.triggerShootBurst(), 2200);
+        },
+        update: (t) => {
+          if (hero.x > canvas.width - 180) hero.direction = -1;
+        }
+      },
+      {
+        id: 3,
+        name: "Vertical Wall Climbing (Dedicated Sprites)",
+        badge: "SCENE 3 // WALL CLIMBING SPRITES",
+        desc: "Anunay uses dedicated high-res climbing artwork (anunay_climb1.png & anunay_climb2.png)! Hands grip the vertical screen seam while his knees drive upwards in an authentic hand-over-hand, knee-over-knee climbing stride as he scales the wall.",
+        duration: 5.5,
+        init: () => {
+          hero.surface = 'ground';
+          hero.x = 280;
+          hero.y = hero.groundY;
+          hero.direction = -1;
+          hero.facingProgress = -1;
+          hero.targetVx = -5.5;
+          virtualHand.style.display = 'none';
+        },
+        update: (t) => {
+          // Mascot will hit wall and climb up with climb1 and climb2 sprites
+        }
+      },
+      {
+        id: 4,
+        name: "Ceiling / Upper Area Hanging & Sniper Aim",
+        badge: "SCENE 4 // UPPER CEILING HANG",
+        desc: "Dedicated upper-area hanging artwork (anunay_hang.png & anunay_hang_aim.png)! Suspended by his hands from the overhead ceiling rail with legs dangling below, Anunay traverses the top edge and drops into a tactical one-handed sniper hang aiming his blaster down at the room!",
+        duration: 5.5,
+        init: () => {
+          hero.surface = 'ceiling';
+          hero.x = 180;
+          hero.y = hero.ceilingY;
+          hero.direction = 1;
+          hero.targetVx = 4.0;
+          virtualHand.style.display = 'none';
+          setTimeout(() => {
+            hero.state = 'shoot';
+            hero.triggerShootBurst(hero.x + 120, hero.y + 300);
+          }, 1800);
+          setTimeout(() => {
+            hero.triggerJump(); // drop from ceiling
+          }, 3600);
+        },
+        update: (t) => {}
+      },
+      {
+        id: 5,
+        name: "Pick Up & Fling / Throw Physics",
+        badge: "SCENE 5 // MOUSE INTERACTION",
+        desc: "Move your mouse over Anunay — the cursor switches to grab! Click & hold to lift him by his collar (legs dangle & sway in mid-air). Fling your mouse with a flick to launch him across the room with realistic gravity!",
+        duration: 6.0,
+        init: () => {
+          hero.surface = 'ground';
+          hero.x = canvas.width * 0.38;
+          hero.y = hero.groundY;
+          hero.targetVx = 0;
+          hero.state = 'idle';
+          virtualHand.style.display = 'block';
+          virtualHand.style.opacity = '1';
+
+          // Animate simulated virtual hand
+          const startX = hero.x + 80;
+          const startY = hero.y - 180;
+          virtualHand.style.left = startX + 'px';
+          virtualHand.style.top = startY + 'px';
+
+          // Step 1: Hand moves in to grab
+          setTimeout(() => {
+            virtualHand.style.left = hero.x + 'px';
+            virtualHand.style.top = (hero.y - 65) + 'px';
+          }, 400);
+
+          // Step 2: Grab mascot
+          setTimeout(() => {
+            hero.grab(hero.x, hero.y - 65);
+          }, 1000);
+
+          // Step 3: Wiggle in mid air
+          setTimeout(() => {
+            hero.drag(hero.x + 120, hero.y - 190);
+            virtualHand.style.left = (hero.x + 120) + 'px';
+            virtualHand.style.top = (hero.y - 190) + 'px';
+          }, 1800);
+
+          setTimeout(() => {
+            hero.drag(hero.x - 140, hero.y - 160);
+            virtualHand.style.left = (hero.x - 140) + 'px';
+            virtualHand.style.top = (hero.y - 160) + 'px';
+          }, 2600);
+
+          // Step 4: Big fling upward & rightward!
+          setTimeout(() => {
+            hero.recentMouseVx = 15.0;
+            hero.recentMouseVy = -18.0;
+            hero.release();
+            virtualHand.style.opacity = '0';
+          }, 3400);
+        },
+        update: (t) => {}
+      },
+      {
+        id: 6,
+        name: "Multi-Mascot Clone Party",
+        badge: "SCENE 6 // CLONE PARTY",
+        desc: "Click [ ➕ CLONE ] to spawn additional mini Anunays dropping from the ceiling! Watch an entire crew of Shimeji companions running, climbing walls, sliding, and blasting together across your screen!",
+        duration: 6.5,
+        init: () => {
+          virtualHand.style.display = 'none';
+          hero.surface = 'ground';
+          hero.targetVx = 4.5;
+          hero.autonomous = true;
+
+          // Spawn 3 extra clone companions
+          while (mascots.length < 4) {
+            const clone = createMascot(
+              canvas.width * (0.2 + Math.random() * 0.6),
+              80,
+              0.52
+            );
+            clone.surface = 'air';
+            clone.vy = 2;
+            clone.autonomous = true;
+            clone.triggerJump();
+          }
+        },
+        update: (t) => {}
+      }
+    ];
+
+    // Scene Tour Controller
+    let currentSceneIdx = 0;
+    let sceneTimer = 0;
+    let autoTour = true;
+
+    const cardBadge = document.getElementById('card-badge');
+    const cardTitle = document.getElementById('card-title');
+    const cardDesc = document.getElementById('card-desc');
+    const teleSurface = document.getElementById('tele-surface');
+    const teleSpeed = document.getElementById('tele-speed');
+    const teleState = document.getElementById('tele-state');
+
+    function loadScene(idx) {
+      currentSceneIdx = idx;
+      sceneTimer = 0;
+      const s = SCENES[idx];
+
+      // Reset extra clones unless scene 6
+      if (idx !== 5) {
+        while (mascots.length > 1) {
+          mascots.pop();
+        }
+        hero.autonomous = false;
+      }
+
+      // Update Card UI
+      cardBadge.textContent = s.badge;
+      cardTitle.textContent = s.name;
+      cardDesc.textContent = s.desc;
+
+      // Update Scene Buttons
+      document.querySelectorAll('.scene-btn').forEach((b, i) => {
+        b.classList.toggle('active', (autoTour && i === 0) || (!autoTour && i === idx + 1));
+      });
+
+      s.init();
+    }
+
+    loadScene(0);
+
+    // Scene tab buttons
+    document.querySelectorAll('.scene-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const sc = parseInt(btn.dataset.scene, 10);
+        if (sc === 0) {
+          autoTour = true;
+          document.getElementById('btn-tour').classList.add('active');
+          document.getElementById('btn-tour').textContent = '🎬 AUTO TOUR: ON';
+          loadScene(0);
+        } else {
+          autoTour = false;
+          document.getElementById('btn-tour').classList.remove('active');
+          document.getElementById('btn-tour').textContent = '🎬 AUTO TOUR: OFF';
+          loadScene(sc - 1);
+        }
+      });
+    });
+
+    // Dock Buttons
+    const btnTour = document.getElementById('btn-tour');
+    btnTour.addEventListener('click', () => {
+      autoTour = !autoTour;
+      btnTour.classList.toggle('active', autoTour);
+      btnTour.textContent = autoTour ? '🎬 AUTO TOUR: ON' : '🎬 AUTO TOUR: OFF';
+      if (autoTour) loadScene(currentSceneIdx);
+    });
+
+    document.getElementById('btn-toss').addEventListener('click', () => {
+      autoTour = false;
+      btnTour.classList.remove('active');
+      btnTour.textContent = '🎬 AUTO TOUR: OFF';
+      mascots.forEach(m => {
+        m.surface = 'air';
+        m.vy = -16 - Math.random() * 4;
+        m.vx = (Math.random() - 0.5) * 16;
+        m.triggerJump();
+      });
+    });
+
+    document.getElementById('btn-slide').addEventListener('click', () => {
+      hero.triggerSlide();
+    });
+
+    document.getElementById('btn-climb').addEventListener('click', () => {
+      autoTour = false;
+      btnTour.classList.remove('active');
+      btnTour.textContent = '🎬 AUTO TOUR: OFF';
+      const toRight = hero.x > canvas.width / 2;
+      hero.surface = toRight ? 'wall_right' : 'wall_left';
+      hero.surfaceAngle = toRight ? 0.06 : -0.06;
+      hero.x = toRight ? hero.wallRightX : hero.wallLeftX;
+      hero.direction = toRight ? 1 : -1;
+      hero.facingProgress = hero.direction;
+      hero.targetVy = -4.0;
+      hero.playClimbSound();
+    });
+
+    document.getElementById('btn-ceiling').addEventListener('click', () => {
+      autoTour = false;
+      btnTour.classList.remove('active');
+      btnTour.textContent = '🎬 AUTO TOUR: OFF';
+      hero.surface = 'ceiling';
+      hero.y = hero.ceilingY;
+      hero.direction = 1;
+      hero.targetVx = 4.0;
+    });
+
+    document.getElementById('btn-shoot').addEventListener('click', () => {
+      hero.triggerShootBurst();
+    });
+
+    document.getElementById('btn-clone').addEventListener('click', () => {
+      if (mascots.length < 6) {
+        const c = createMascot(
+          canvas.width * (0.2 + Math.random() * 0.6),
+          80,
+          0.52
+        );
+        c.surface = 'air';
+        c.vy = 2;
+        c.autonomous = true;
+        c.triggerJump();
+      }
+    });
+
+    const soundBtn = document.getElementById('btn-sound');
+    soundBtn.addEventListener('click', () => {
+      hero.soundEnabled = !hero.soundEnabled;
+      soundBtn.classList.toggle('active', hero.soundEnabled);
+      soundBtn.textContent = hero.soundEnabled ? '🔊 SOUND' : '🔇 MUTED';
+    });
+
+    // Draw Cybernetic Grid Stage (Floor, Walls, Ceiling)
+    function drawStage() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const ground = h - 75;
+      const ceiling = 60;
+      const wallL = 55;
+      const wallR = w - 55;
+
+      // Stars
+      ctx.fillStyle = '#ffffff';
+      for (let s = 0; s < 45; s++) {
+        const sx = ((s * 137.5) % w);
+        const sy = ((s * 93.1) % (ground - 60)) + ceiling;
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+
+      // 1. Neon Floor Grid
+      ctx.strokeStyle = '#5b3cff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, ground);
+      ctx.lineTo(w, ground);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#3df0ff';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#3df0ff';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.moveTo(0, ground);
+      ctx.lineTo(w, ground);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Perspective floor lines
+      ctx.strokeStyle = 'rgba(91, 60, 255, 0.3)';
+      ctx.lineWidth = 1.5;
+      for (let x = 0; x < w; x += 45) {
+        ctx.beginPath();
+        ctx.moveTo(x, ground);
+        ctx.lineTo(x + (x - w / 2) * 0.45, h);
+        ctx.stroke();
+      }
+
+      // 2. Neon Ceiling Track
+      ctx.strokeStyle = 'rgba(255, 61, 240, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#ff3df0';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.moveTo(0, ceiling);
+      ctx.lineTo(w, ceiling);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // 3. Neon Wall Guides
+      ctx.strokeStyle = 'rgba(61, 240, 255, 0.35)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(wallL, ceiling);
+      ctx.lineTo(wallL, ground);
+      ctx.moveTo(wallR, ceiling);
+      ctx.lineTo(wallR, ground);
+      ctx.stroke();
+
+      // Wall Ruler Tick Marks
+      ctx.fillStyle = 'rgba(61, 240, 255, 0.6)';
+      for (let y = ceiling; y <= ground; y += 40) {
+        ctx.fillRect(wallL - 6, y, 6, 2);
+        ctx.fillRect(wallR, y, 6, 2);
+      }
+    }
+
+    // Main Showcase Render Loop
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+
+      // Scene auto tour advancement
+      if (autoTour) {
+        sceneTimer += dt;
+        const currentScene = SCENES[currentSceneIdx];
+        currentScene.update(sceneTimer);
+
+        if (sceneTimer >= currentScene.duration) {
+          const nextIdx = (currentSceneIdx + 1) % SCENES.length;
+          loadScene(nextIdx);
+        }
+      }
+
+      // Update Telemetry Display
+      teleSurface.textContent = `SURFACE: ${hero.surface.toUpperCase()}`;
+      teleSpeed.textContent = `SPEED: ${Math.hypot(hero.vx, hero.vy).toFixed(1)} PX/F`;
+      teleState.textContent = `POSE: ${hero.state.toUpperCase()}`;
+
+      // Render Stage & Mascots
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawStage();
+
+      mascots.forEach(m => {
+        m.update(dt);
+        m.render();
+      });
+
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
