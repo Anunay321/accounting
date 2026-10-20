@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Where Did the Money Go? | Group 6</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"></head><body class="d">
+<div id="bg"></div><div id="blobs"><i></i><i></i><i></i></div><canvas id="cv"></canvas><canvas id="fx"></canvas><div id="wp"><div id="wl"></div></div><div id="cur"></div><div id="pg"></div>
+<div class="hud"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i>
+<span style="top:6px;left:26px">GROUP6 / ACCOUNTING REEL 2026</span><span style="top:6px;right:26px" id="tc">TC 00:00:00</span>
+<span style="bottom:6px;left:26px" id="sl">01 / INTRO</span><span style="bottom:6px;right:26px">1920 X 1080 / 60 FPS</span></div>
+
+<section class="slide" data-t="Intro" data-th="d" data-bg="#07070f"><div class="wrap">
+<div class="stk">GRP<br>06</div>
+<div class="tag r">ACCOUNTING PRESENTATION</div>
+<h1 class="r g">Where did the <span class="chrome">money</span> go?</h1>
+<p class="quote r">Ledger, Posting and Balancing</p>
+<p class="r">Group 6 | Accounting Presentation | 12 slides. Presented by (click any member to view their full HD comic poster):</p>
+<div class="grid r member-grid">
+<div class="b o mem-card" onclick="openPosterModal(1)" role="button" tabindex="0" title="Click to view Aarav's full HD poster"><div class="mem-card-top"><span class="mem-badge">MEMBER 1</span><span class="mem-slides-pill">SLIDES 1–2</span></div><div class="mem-avatar-wrap"><img src="avatar_aarav.jpg" alt="Aarav Avatar" class="mem-avatar-hero"></div><div class="mem-card-name">Aarav</div><div class="mem-card-tagline">The Rider</div><div class="mem-card-topic">Introduction &amp; need for a ledger</div><div class="mem-card-btn"><span>🔍 VIEW POSTER</span></div></div>
+<div class="b l mem-card" onclick="openPosterModal(2)" role="button" tabindex="0" title="Click to view Adarsh's full HD poster"><div class="mem-card-top"><span class="mem-badge">MEMBER 2</span><span class="mem-slides-pill">SLIDES 3–4</span></div><div class="mem-avatar-wrap"><img src="avatar_adarsh.jpg" alt="Adarsh Avatar" class="mem-avatar-hero"></div><div class="mem-card-name">Adarsh</div><div class="mem-card-tagline">The Skater</div><div class="mem-card-topic">Meaning, journal vs ledger</div><div class="mem-card-btn"><span>🔍 VIEW POSTER</span></div></div>
+<div class="b p mem-card" onclick="openPosterModal(3)" role="button" tabindex="0" title="Click to view Anunay's full HD poster"><div class="mem-card-top"><span class="mem-badge">MEMBER 3</span><span class="mem-slides-pill">SLIDES 5–7</span></div><div class="mem-avatar-wrap"><img src="avatar_anunay.jpg" alt="Anunay Avatar" class="mem-avatar-hero"></div><div class="mem-card-name">Anunay</div><div class="mem-card-tagline">The Blaster</div><div class="mem-card-topic">Format, posting, business example</div><div class="mem-card-btn"><span>🔍 VIEW POSTER</span></div></div>
+<div class="b v mem-card" onclick="openPosterModal(4)" role="button" tabindex="0" title="Click to view Dhairya's full HD poster"><div class="mem-card-top"><span class="mem-badge">MEMBER 4</span><span class="mem-slides-pill">SLIDES 8–10</span></div><div class="mem-avatar-wrap"><img src="avatar_dhairya.jpg" alt="Dhairya Avatar" class="mem-avatar-hero"></div><div class="mem-card-name">Dhairya</div><div class="mem-card-tagline">The Cashier</div><div class="mem-card-topic">Cash a/c, debtors/creditors, balancing</div><div class="mem-card-btn"><span>🔍 VIEW POSTER</span></div></div>
+<div class="b mem-card" onclick="openPosterModal(5)" role="button" tabindex="0" title="Click to view Tirth's full HD poster"><div class="mem-card-top"><span class="mem-badge">MEMBER 5</span><span class="mem-slides-pill">SLIDES 11–12</span></div><div class="mem-avatar-wrap"><img src="avatar_tirth.jpg" alt="Tirth Avatar" class="mem-avatar-hero"></div><div class="mem-card-name">Tirth</div><div class="mem-card-tagline">The Cruiser</div><div class="mem-card-topic">Trial balance, errors, conclusion</div><div class="mem-card-btn"><span>🔍 VIEW POSTER</span></div></div>
+</div>
+<p class="r">Swipe, use the bar below, or press the arrow keys.</p></div></section>
+
+<section class="slide" data-t="Why a ledger" data-th="l" data-bg="#d4ff3a"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(1)" title="Click to view Aarav's poster"><img src="avatar_aarav.jpg" alt="Aarav" class="mem-tag-img"><span class="tag-txt">MEMBER 1 · AARAV</span></div>
+<h2 class="r g">Introduction: why do we need a <em>ledger?</em></h2>
+<p class="r">Every business carries out numerous transactions daily: purchases, sales, payments, receipts and expenses. Recording them is important, but simply listing them by date does not make it easy to understand the complete financial position of the business.</p>
+<p class="r"><b>A ledger organizes transactions into separate accounts, helping a business track its money and financial activities.</b></p>
+<div class="grid r">
+<div class="b o"><h3>Cash</h3><br>It shows how much cash the business has.</div>
+<div class="b"><h3>Activity</h3><br>It records purchases, sales, assets and expenses.</div>
+<div class="b p"><h3>Owed</h3><br>It identifies money owed by customers and money payable to suppliers.</div>
+<div class="b v"><h3>Reports</h3><br>It helps calculate account balances and prepare financial statements.</div></div>
+<div class="b r"><h3>Example</h3><br>A shopkeeper may have hundreds of transactions in a month. By checking the Cash Account in the ledger, the shopkeeper can quickly find the remaining cash balance without reviewing every transaction individually.</div></div></section>
+
+<section class="slide" data-t="What is a ledger" data-th="d" data-bg="#07070f"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(2)" title="Click to view Adarsh's poster"><img src="avatar_adarsh.jpg" alt="Adarsh" class="mem-tag-img"><span class="tag-txt">MEMBER 2 · ADARSH</span></div>
+<h2 class="r g">What is a <em>ledger?</em></h2>
+<p class="r">A ledger is the <b class="k">principal book of accounts</b> in which transactions are classified and recorded in separate accounts. It is also commonly called the <b class="k">book of final entry</b>. Each account records transactions relating to a particular item, person, expense, income or source of funds.</p>
+<h3 class="r" style="font-family:'Archivo Black';text-transform:uppercase">Main types of ledger accounts</h3>
+<div class="grid r">
+<div class="b o"><h3>Personal</h3><br>Accounts of individuals, firms and organizations, such as Amit's Account or Ravi's Account.</div>
+<div class="b l"><h3>Real</h3><br>Accounts of assets and property, such as Cash, Furniture and Machinery Account.</div>
+<div class="b p"><h3>Nominal</h3><br>Accounts of expenses, losses, incomes and gains, such as Rent, Salaries and Sales Account.</div></div>
+<div class="b r"><h3>Importance of a ledger</h3><ul><li>Classifies transactions account-wise.</li><li>Helps determine the balance of each account.</li><li>Provides information about assets, liabilities, income and expenses.</li><li>Supplies the information required to prepare a trial balance and financial statements.</li></ul></div></div></section>
+
+<section class="slide" data-t="Journal vs ledger" data-th="l" data-bg="#ff4a1c"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(2)" title="Click to view Adarsh's poster"><img src="avatar_adarsh.jpg" alt="Adarsh" class="mem-tag-img"><span class="tag-txt">MEMBER 2 · ADARSH</span></div>
+<h2 class="r g">Journal vs <em>Ledger</em></h2>
+<p class="r">Both are essential accounting records, but they serve different purposes.</p>
+<div class="b r" style="overflow-x:auto;padding:0"><table><tr><th>Basis</th><th>Journal</th><th>Ledger</th></tr>
+<tr><td>Meaning</td><td>Records transactions chronologically</td><td>Groups transactions into individual accounts</td></tr>
+<tr><td>Recording order</td><td>Date-wise</td><td>Account-wise</td></tr>
+<tr><td>Main process</td><td>Journalising</td><td>Posting</td></tr>
+<tr><td>Structure</td><td>Journal entries</td><td>Separate ledger accounts</td></tr>
+<tr><td>Main purpose</td><td>Records the original transaction</td><td>Shows the activity and balance of each account</td></tr>
+<tr><td>Example</td><td>Records the purchase of furniture on a particular date</td><td>Shows all transactions relating to Furniture Account</td></tr></table></div>
+<div class="b l r"><h3>Example</h3><br>When a business purchases furniture for ₹10,000 in cash, the transaction is first recorded in the journal. The entry is then posted to the Furniture Account and Cash Account in the ledger.</div>
+<div class="b r"><h3>Key takeaway</h3><br>The journal tells us <b class="k">what happened and when</b>, while the ledger helps us understand <b class="k">how each account was affected</b>.</div></div></section>
+
+<section class="slide" data-t="Ledger format" data-th="l" data-bg="#efeadf"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(3)" title="Click to view Anunay's poster"><img src="avatar_anunay.jpg" alt="Anunay" class="mem-tag-img"><span class="tag-txt">MEMBER 3 · ANUNAY</span></div>
+<h2 class="r g">Format of a <em>ledger account</em></h2>
+<p class="r">A traditional ledger account is prepared in a T-format, with two sides. Tap a side to highlight it.</p>
+<div class="b r" style="padding:0"><h3 style="display:block;text-align:center;margin:0;padding:8px">Cash Account</h3>
+<div class="t" style="border:0">
+<div class="hl" style="cursor:pointer"><b class="k">DEBIT (Dr.) · Left side</b><br>Date | Particulars | J.F. | Amount</div>
+<div class="hl" style="cursor:pointer"><b class="o2">CREDIT (Cr.) · Right side</b><br>Date | Particulars | J.F. | Amount</div></div></div>
+<p class="r"><b>J.F. means Journal Folio</b>, a reference to the relevant journal page.</p>
+<div class="grid r">
+<div class="b o"><h3>Date</h3><br>The date of the transaction or balancing entry.</div>
+<div class="b l"><h3>Particulars</h3><br>The name of the corresponding account or balancing item.</div>
+<div class="b v"><h3>J.F.</h3><br>The journal page reference.</div>
+<div class="b"><h3>Amount</h3><br>The value recorded on the debit or credit side.</div></div>
+<div class="b r">The left side is always the debit side, and the right side is always the credit side. The account is completed by recording the transactions on the appropriate sides and calculating its balance.</div></div></section>
+
+<section class="slide" data-t="Posting" data-th="d" data-bg="#5b3cff"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(3)" title="Click to view Anunay's poster"><img src="avatar_anunay.jpg" alt="Anunay" class="mem-tag-img"><span class="tag-txt">MEMBER 3 · ANUNAY</span></div>
+<h2 class="r g">What is <em>posting?</em></h2>
+<p class="r"><b>Posting is the process of transferring journal entries to their respective ledger accounts.</b> It ensures that every transaction is reflected in all the accounts it affects. Tap the steps to tick them off.</p>
+<div class="chips r" id="st1"><button class="chip">1 Identify the accounts affected by the transaction</button><button class="chip">2 Examine the journal entry to identify the debit and credit accounts</button><button class="chip">3 Post the debit amount to the debit side of the relevant account</button><button class="chip">4 Post the credit amount to the credit side of the other account</button><button class="chip">5 Enter the corresponding account name and relevant reference</button></div>
+<div class="grid r">
+<div class="b"><h3>Example: owner invests ₹50,000 in cash</h3><br><table><tr><th>Particulars</th><th>Debit</th><th>Credit</th></tr><tr><td>Cash A/c Dr.</td><td class="n">₹50,000</td><td></td></tr><tr><td>&nbsp;&nbsp;To Capital A/c</td><td></td><td class="n">₹50,000</td></tr></table></div>
+<div class="b l"><h3>Posted</h3><br>In Cash Account, ₹50,000 is posted on the <b>debit</b> side.<br>In Capital Account, ₹50,000 is posted on the <b>credit</b> side.</div></div>
+<div class="b r">Posting connects the journal with the ledger and helps maintain a complete record of every transaction.</div></div></section>
+
+<section class="slide" data-t="Live example" data-th="d" data-bg="#07070f"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(3)" title="Click to view Anunay's poster"><img src="avatar_anunay.jpg" alt="Anunay" class="mem-tag-img"><span class="tag-txt">MEMBER 3 · ANUNAY</span></div>
+<h2 class="r g">Practical business <em>example</em></h2>
+<p class="r">A small shop starts operations with ₹50,000 in cash. Tap a transaction: it is journalised, then each line flies into its ledger account. Hit Balance accounts to close them off.</p>
+<div class="chips r" id="tx"></div>
+<div class="r" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="all">Post all</button><button class="btn" id="bl">Balance accounts</button><button class="btn x" id="rst">Reset</button></div>
+<div class="b r"><h3>Journal</h3><br><div id="jr"></div></div>
+<div class="grid r" id="acc"></div>
+<div class="b r" id="eq"></div>
+<div class="b r"><h3>How are these recorded?</h3><ul><li>Cash and Capital are affected by the owner's investment.</li><li>Furniture and Cash are affected by the furniture purchase.</li><li>Purchases and Ravi's Account are affected by the credit purchase.</li><li>Amit's Account and Sales are affected by the credit sale.</li><li>Cash and Amit's Account are affected when Amit pays.</li><li>Ravi's Account and Cash are affected when the business pays Ravi.</li></ul>Each transaction is recorded using the <b class="k">double-entry system</b>, then posted to the relevant ledger accounts.</div></div></section>
+
+<section class="slide" data-t="Cash account" data-th="l" data-bg="#d4ff3a"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(4)" title="Click to view Dhairya's poster"><img src="avatar_dhairya.jpg" alt="Dhairya" class="mem-tag-img"><span class="tag-txt">MEMBER 4 · DHAIRYA</span></div>
+<h2 class="r g">Posting to the <em>Ledger Accounts</em></h2>
+<p class="r">Pick any account and view it three ways. Every number comes from the same six journal entries.</p>
+<div class="chips r" id="av"></div>
+<div class="chips r" id="vw"><button class="chip done" data-v="t">T-account</button><button class="chip" data-v="p">Ledger page</button><button class="chip" data-v="r">Running balance</button></div>
+<div class="b r"><div id="lv"></div></div>
+<div class="b o r"><h3>Closing balance</h3><div class="big" id="cb" data-n="0">₹0</div></div>
+<div class="b r" id="cl"></div></div></section>
+
+<section class="slide" data-t="Debtors and creditors" data-th="l" data-bg="#efeadf"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(4)" title="Click to view Dhairya's poster"><img src="avatar_dhairya.jpg" alt="Dhairya" class="mem-tag-img"><span class="tag-txt">MEMBER 4 · DHAIRYA</span></div>
+<h2 class="r g">Understanding debtor and <em>creditor</em> balances</h2>
+<p class="r">A ledger does more than track cash. It also helps a business identify who owes money to the business and whom the business must pay.</p>
+<div class="grid r" id="dc"></div>
+<div class="b r"><h3>Why does this matter?</h3><ul><li>The business can follow up on unpaid customer balances.</li><li>It can plan payments to suppliers.</li><li>It can avoid overlooking outstanding amounts.</li><li>It can understand its short-term financial obligations.</li></ul></div>
+<div class="b l r" id="dn"></div></div></section>
+
+<section class="slide" data-t="Balancing" data-th="l" data-bg="#ff4a1c"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(4)" title="Click to view Dhairya's poster"><img src="avatar_dhairya.jpg" alt="Dhairya" class="mem-tag-img"><span class="tag-txt">MEMBER 4 · DHAIRYA</span></div>
+<h2 class="r g">What is balancing of <em>ledger accounts?</em></h2>
+<p class="r"><b>Balancing is the process of finding the difference between the total debit side and the total credit side of a ledger account.</b> The difference represents the account's balance. Tap the steps to tick them off.</p>
+<div class="chips r" id="st2"><button class="chip">1 Calculate the total of the debit side</button><button class="chip">2 Calculate the total of the credit side</button><button class="chip">3 Find the difference between the two totals</button><button class="chip">4 Enter the difference as Balance c/d on the side with the smaller total</button><button class="chip">5 Bring the balance forward into the next period as Balance b/d, on the appropriate side</button></div>
+<div class="grid r">
+<div class="b l"><h3>Balance c/d</h3><br>Balance carried down at the end of the accounting period.</div>
+<div class="b p"><h3>Balance b/d</h3><br>Balance brought down at the beginning of the next period.</div>
+<div class="b"><h3>Debit balance</h3><br>The debit total exceeds the credit total before balancing.</div>
+<div class="b v"><h3>Credit balance</h3><br>The credit total exceeds the debit total before balancing.</div></div>
+<div class="b r">In our example, the Cash Account has a debit total of ₹57,000 before balancing and a credit total of ₹15,000. The difference is <b class="k">₹42,000</b>, which is carried down on the credit side to equalize both sides. It is then brought down as a debit balance in the next period.</div></div></section>
+
+<section class="slide" data-t="Trial balance" data-th="d" data-bg="#07070f"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(5)" title="Click to view Tirth's poster"><img src="avatar_tirth.jpg" alt="Tirth" class="mem-tag-img"><span class="tag-txt">MEMBER 5 · TIRTH</span></div>
+<h2 class="r g">Trial balance &amp; common <em>errors</em></h2>
+<p class="r">After ledger accounts are balanced, their balances can be listed in a trial balance: a statement showing the debit and credit balances of ledger accounts at a particular date. Its main purpose is to check the arithmetical equality of the ledger balances. Try breaking it.</p>
+<div class="b r" style="overflow-x:auto;padding:0"><table id="tb"></table></div>
+<div class="r" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><button class="btn x" data-e="amt">Wrong amount</button><button class="btn x" data-e="side">Wrong side</button><button class="btn x" data-e="omit">Omission</button><button class="btn x" data-e="comp">Compensating</button><button class="btn" data-e="">Fix</button></div>
+<div class="r"><b id="stt"></b><p id="hint" style="margin-top:6px"></p></div>
+<div class="b r"><h3>Balance beam</h3><br><div id="beam"><div id="bm"><span id="pl"></span><span id="pr"></span></div><u></u></div></div>
+<div class="grid r">
+<div class="b"><h3>Common errors in ledger posting</h3><ul><li>Posting an amount to the wrong account.</li><li>Recording an amount on the wrong side.</li><li>Omitting an entry from one account.</li><li>Posting an incorrect amount.</li><li>Making an addition or balancing mistake.</li></ul></div>
+<div class="b o"><h3>Important</h3><br>Even if a trial balance agrees, some errors may remain undetected, such as a transaction completely omitted from the books or an equal amount incorrectly posted to the wrong accounts.</div></div></div></section>
+
+<section class="slide" data-t="Conclusion" data-th="d" data-bg="#5b3cff"><div class="wrap">
+<div class="tag r mem-tag" onclick="openPosterModal(5)" title="Click to view Tirth's poster"><img src="avatar_tirth.jpg" alt="Tirth" class="mem-tag-img"><span class="tag-txt">MEMBER 5 · TIRTH</span></div>
+<h2 class="r g">Importance, applications &amp; <em>conclusion</em></h2>
+<div class="grid r">
+<div class="b o"><h3>Financial tracking</h3><br>Helps businesses understand their cash, assets, expenses, income and liabilities.</div>
+<div class="b l"><h3>Control</h3><br>Makes it easier to review entries and identify mistakes.</div>
+<div class="b p"><h3>Customers &amp; suppliers</h3><br>Shows outstanding receivables and payables.</div>
+<div class="b"><h3>Decision-making</h3><br>Provides information for planning purchases, payments and operations.</div>
+<div class="b v"><h3>Reporting</h3><br>Provides the balances needed to prepare a trial balance and financial statements.</div></div>
+<div class="b r"><h3>Real-life applications</h3><br>Ledgers are used by retail shops, manufacturing companies, banks, service businesses and large corporations. Modern accounting software automates much of the posting and balancing, but the underlying principles remain the same.</div>
+<div class="b p r"><h3>Conclusion</h3><br>The journal records transactions in date order, the ledger classifies them account-wise, posting transfers entries into the ledger, and balancing calculates the remaining amount in each account. Together, these processes help businesses keep organized records and understand their financial position.</div>
+<div class="b l r"><p class="quote">"Every transaction tells a story, every ledger account organizes that story, and every balance helps explain where the money went."</p></div></div></section>
+
+<div id="poster-modal" class="mem-modal" aria-hidden="true" role="dialog" aria-label="Member Poster Modal">
+<div class="mem-modal-backdrop" onclick="closePosterModal()"></div>
+<div class="mem-modal-dialog">
+<div class="mem-modal-header">
+<div class="mem-modal-title"><span class="mem-modal-tag" id="modal-tag">MEMBER 01 // GROUP 6</span><div id="modal-name" class="mem-modal-h2">AARAV</div></div>
+<button class="btn x mem-modal-close" onclick="closePosterModal()" aria-label="Close modal">✕ ESC</button>
+</div>
+<div class="mem-modal-body">
+<div class="mem-modal-poster-wrap" onclick="openLightbox()" title="Click to view in 100% Fullscreen HD Lightbox">
+<img id="modal-img" src="" alt="Poster" class="mem-modal-img">
+<div class="mem-modal-stamp" id="modal-stamp">VERIFIED</div>
+<div class="mem-modal-zoom-banner"><span>🔍 Click to View Fullscreen HD (100% Crisp)</span></div>
+</div>
+<div class="mem-modal-details">
+<div class="b p mem-modal-box">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+<img id="modal-avatar" src="avatar_aarav.jpg" alt="Avatar" class="mem-modal-avatar">
+<div>
+<div class="mem-modal-field-title">PRESENTATION ROLE</div>
+<div class="big" id="modal-slides" style="font-size:clamp(22px,4vw,32px);margin:2px 0 0">SLIDES 1–2</div>
+<div id="modal-tagline-text" style="font:700 11px 'Space Mono',monospace;color:var(--o)">THE RIDER</div>
+</div>
+</div>
+<p id="modal-topic" style="font-weight:700;margin-bottom:8px"></p>
+<p id="modal-desc" style="font-size:12px;opacity:.9;margin-bottom:12px"></p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<button class="btn" id="modal-hd-btn" onclick="openLightbox()" style="width:100%;background:var(--l);color:#000">🔍 OPEN FULLSCREEN HD LIGHTBOX</button>
+<button class="btn" id="modal-jump-btn" onclick="jumpToMemberSlide()" style="width:100%">🚀 JUMP TO MEMBER'S SLIDES</button>
+</div>
+</div>
+<div class="mem-modal-nav-row">
+<button class="btn" onclick="prevPoster()" aria-label="Previous member">◀ PREV</button>
+<div class="mem-modal-counter" id="modal-counter">1 / 5</div>
+<button class="btn" onclick="nextPoster()" aria-label="Next member">NEXT ▶</button>
+</div>
+<div class="mem-modal-hint">Press <b>ESC</b> to close, <b>← / →</b> to switch members, <b>Click artwork</b> to zoom</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="poster-lightbox" class="lightbox-modal" aria-hidden="true" role="dialog" aria-label="Fullscreen HD Poster" onclick="closeLightbox()">
+<div class="lightbox-dialog" onclick="event.stopPropagation()">
+<div class="lightbox-topbar">
+<div class="lightbox-title-wrap">
+<span class="lightbox-tag">100% FULL HD</span>
+<span id="lightbox-caption" class="lightbox-name">AARAV // THE RIDER</span>
+</div>
+<div style="display:flex;align-items:center;gap:8px">
+<a id="lightbox-raw-btn" href="" target="_blank" class="btn" style="text-decoration:none;font-size:11px" title="Open raw full-res PNG file in a new tab">↗ OPEN RAW PNG</a>
+<button class="btn x" onclick="closeLightbox()" aria-label="Close Fullscreen View">✕ ESC</button>
+</div>
+</div>
+<div class="lightbox-image-wrap">
+<img id="lightbox-img" src="" alt="Full Resolution Poster">
+</div>
+<div class="lightbox-bottombar">
+<span>🔍 ORIGINAL HIGH RESOLUTION ARTWORK · ZERO DOWNSCALING BLUR</span>
+<span class="lightbox-hint">Click outside or press ESC to close</span>
+</div>
+</div>
+</div>
+
+<canvas id="anunay-runner-canvas" title="Anunay Shimeji Mascot: Click &amp; Drag to throw! Climbs walls &amp; ceiling!"></canvas>
+<div class="runner-hud-pill">
+  <button class="runner-btn active" id="runner-toggle-btn" title="Toggle Shimeji Screen Mascot">🐾 SHIMEJI: ON</button>
+  <button class="runner-btn" id="shimeji-spawn-btn" title="Spawn another Shimeji companion">➕ CLONE</button>
+  <button class="runner-btn" id="shimeji-toss-btn" title="Toss Shimeji into the air!">🦘 TOSS</button>
+  <a href="shimeji-demo.html" class="runner-btn" target="_blank" title="Watch Full Shimeji Mascot Animation Demo Reel" style="color:var(--l,#d4ff3a)">🎬 DEMO REEL</a>
+  <a href="anunay-character.html" class="runner-btn" target="_blank" title="Open Full 2D Character Action Arena">🎮 ARENA ↗</a>
+</div>
+
+<div class="nav"><button class="btn" id="pv">◀</button><div class="dots" id="dots"></div><button class="btn" id="nx">▶</button><button class="btn" id="mu" aria-label="Toggle sound">🔊</button><button class="btn" id="lt" aria-label="Lite mode">⚡ LITE</button></div>
+
+<script src="anunay-2d.js"></script>
+<script src="script.js"></script></body></html>

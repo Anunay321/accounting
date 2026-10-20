@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anunay // Shimeji Desktop Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0c16;
+  --ink: #e8ebff;
+  --card: rgba(18, 20, 36, 0.94);
+  --line: #2a3060;
+  --ac: #3df0ff;
+  --mut: #8e98c7;
+  --magenta: #d8009b;
+  --purple: #8b28d6;
+  --yellow: #f5d300;
+  --lime: #d4ff3a;
+  --orange: #ff4a1c;
+  --gap: calc(28px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+
+* { box-sizing: inherit; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.4 'Space Grotesk', system-ui, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Floor & Wall Boundaries */
+#floor {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--gap);
+  background: linear-gradient(180deg, rgba(61, 240, 255, 0.3) 0%, rgba(20, 24, 48, 0.95) 100%);
+  border-top: 2px solid var(--ac);
+  box-shadow: 0 -4px 18px rgba(61, 240, 255, 0.35);
+  z-index: 2;
+}
+
+#ceiling-rail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--ac);
+  box-shadow: 0 2px 14px var(--ac);
+  z-index: 2;
+}
+
+/* Cybernetic Sky Backdrop */
+#sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(circle at 50% 20%, #171b3c 0%, #080912 85%);
+  pointer-events: auto;
+}
+
+#sky-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: 
+    linear-gradient(rgba(61, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+#orb {
+  position: fixed;
+  z-index: 1;
+  font-size: 38px;
+  pointer-events: none;
+  transition: left 1s ease, top 1s ease;
+  filter: drop-shadow(0 0 16px rgba(255, 220, 100, 0.6));
+}
+
+/* Control Panel */
+#panel {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 20;
+  width: min(340px, calc(100vw - 28px));
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 4px 4px 0 rgba(61, 240, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+#panel:hover {
+  border-color: var(--ac);
+}
+
+#panel summary {
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ac);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+}
+
+#panel summary::-webkit-details-marker { display: none; }
+#panel summary::after { content: '▾'; font-size: 16px; transition: transform 0.2s; }
+#panel[open] summary::after { transform: rotate(180deg); }
+
+#inner {
+  max-height: 64vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 10px;
+}
+
+#inner::-webkit-scrollbar { width: 4px; }
+#inner::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+
+.r {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+
+.r > span {
+  color: var(--mut);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  min-width: 68px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+input[type=text], select {
+  font: inherit;
+  font-size: 12px;
+  color: var(--ink);
+  background: rgba(10, 12, 22, 0.8);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  min-width: 0;
+  flex: 1;
+  outline: none;
+}
+
+input[type=text]:focus, select:focus {
+  border-color: var(--ac);
+  box-shadow: 0 0 8px rgba(61, 240, 255, 0.3);
+}
+
+.b {
+  border: 1px solid var(--line);
+  background: rgba(14, 18, 32, 0.9);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 5px 11px;
+  font: 700 11px 'Space Mono', monospace;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+}
+
+.b:hover, .b:focus-visible {
+  border-color: var(--ac);
+  background: rgba(61, 240, 255, 0.15);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.b.on {
+  background: var(--ac);
+  color: #000;
+  border-color: var(--ac);
+  box-shadow: 0 0 12px rgba(61, 240, 255, 0.5);
+}
+
+.b.action-blast {
+  background: rgba(255, 74, 28, 0.2);
+  border-color: var(--orange);
+  color: var(--orange);
+}
+.b.action-blast:hover {
+  background: var(--orange);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255, 74, 28, 0.6);
+}
+
+.nav-links {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+}
+
+/* Needs Bars */
+.bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.bar i {
+  display: block;
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, var(--ac), var(--lime));
+  transition: width 0.35s ease;
+  box-shadow: 0 0 8px var(--ac);
+}
+
+/* Pet Mascot Root */
+#pet {
+  position: fixed;
+  left: 0;
+  bottom: var(--gap);
+  width: 104px;
+  height: 144px;
+  z-index: 10;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform;
+}
+
+#pet[data-m=drag] {
+  cursor: grabbing;
+}
+
+/* Speech Bubble */
+#bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, 6px);
+  background: rgba(7, 9, 18, 0.95);
+  color: var(--ac);
+  border: 1px solid var(--ac);
+  font: 700 11px/1.3 'Space Mono', monospace;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 10px rgba(61, 240, 255, 0.3);
+}
+
+#bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--ac);
+}
+
+#bubble.on {
+  opacity: 1;
+  transform: translate(-50%, -8px);
+}
+
+.h {
+  position: absolute;
+  left: 45%;
+  top: -10px;
+  color: #ff2a85;
+  font-size: 22px;
+  pointer-events: none;
+  animation: floatHeart 1s forwards cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 0 6px #ff2a85);
+}
+@keyframes floatHeart {
+  to { transform: translateY(-60px) scale(1.3); opacity: 0; }
+}
+
+#lean {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.3, 1);
+  transform-origin: 50% 100%;
+}
+
+#av {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 100%;
+}
+
+#av.sq {
+  animation: squashLanding 0.38s ease;
+}
+@keyframes squashLanding {
+  0% { transform: scale(1.24, 0.76); }
+  45% { transform: scale(0.92, 1.08); }
+  100% { transform: scale(1, 1); }
+}
+
+/* ==============================================================
+   AVATAR STYLING & ANIMATIONS
+   ============================================================== */
+.lim {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+#all {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.22s ease;
+  animation: idleBob 1.6s ease-in-out infinite alternate;
+}
+@keyframes idleBob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
+}
+
+/* Natural Limbs & Motion Keyframes */
+@keyframes strideWalk {
+  from { transform: rotate(-30deg); }
+  to { transform: rotate(30deg); }
+}
+@keyframes hopWalk {
+  to { transform: translateY(-4px); }
+}
+@keyframes waveArm {
+  from { transform: rotate(-130deg); }
+  to { transform: rotate(-172deg); }
+}
+
+/* Vertical Wall Climbing - Hand-over-hand gripping */
+@keyframes climbArmL {
+  0% { transform: rotate(140deg); }
+  100% { transform: rotate(178deg); }
+}
+@keyframes climbArmR {
+  0% { transform: rotate(-178deg); }
+  100% { transform: rotate(-140deg); }
+}
+@keyframes legClimb {
+  from { transform: rotate(-22deg); }
+  to { transform: rotate(18deg); }
+}
+@keyframes legFlail {
+  from { transform: rotate(-16deg); }
+  to { transform: rotate(16deg); }
+}
+
+/* Mascot Modes */
+[data-m=walk] #all { animation: hopWalk 0.22s ease-in-out infinite alternate; }
+[data-m=walk] #legL, [data-m=walk] #armR { animation: strideWalk 0.44s ease-in-out infinite alternate; }
+[data-m=walk] #legR, [data-m=walk] #armL { animation: strideWalk 0.44s ease-in-out infinite alternate-reverse; }
+
+[data-m=sit] #all, [data-m=sleep] #all { animation: none; transform: translateY(18px); }
+[data-m=sleep] #all { transform: translateY(18px) rotate(8deg); }
+[data-m=sit] #legL, [data-m=sleep] #legL { transform: rotate(82deg); }
+[data-m=sit] #legR, [data-m=sleep] #legR { transform: rotate(-82deg); }
+
+[data-m=wave] #armR { animation: waveArm 0.3s ease-in-out infinite alternate; }
+
+/* WALL CLIMBING - Both hands actively gripping wall with climbing heave */
+[data-m=climb] #all { animation: hopWalk 0.23s ease-in-out infinite alternate; }
+[data-m=climb] #armL { animation: climbArmL 0.46s ease-in-out infinite alternate; }
+[data-m=climb] #armR { animation: climbArmR 0.46s ease-in-out infinite alternate-reverse; }
+[data-m=climb] #legL { animation: legClimb 0.46s ease-in-out infinite alternate; }
+[data-m=climb] #legR { animation: legClimb 0.46s ease-in-out infinite alternate-reverse; }
+
+/* CEILING HANGING - Hands gripping ceiling rail */
+[data-m=ceiling] #all { animation: none; }
+[data-m=ceiling] #armL { transform: rotate(172deg); }
+[data-m=ceiling] #armR { transform: rotate(-172deg); }
+[data-m=ceiling] #legL { animation: legFlail 0.8s ease-in-out infinite alternate; }
+[data-m=ceiling] #legR { animation: legFlail 0.8s ease-in-out infinite alternate-reverse; }
+
+/* HOLDING FROM THE HAND (DRAG / AIR) */
+/* When grabbed, Anunay is held directly by his raised gripping hand! */
+[data-m=drag] #armR {
+  transform: rotate(-176deg) !important; /* Right hand reaches straight UP to the mouse pointer! */
+}
+[data-m=drag] #armL {
+  transform: rotate(145deg);
+}
+[data-m=drag] #legL { animation: legFlail 0.32s ease-in-out infinite alternate; }
+[data-m=drag] #legR { animation: legFlail 0.32s ease-in-out infinite alternate-reverse; }
+[data-m=drag] #all { animation: none; }
+
+[data-m=air] #armL { transform: rotate(152deg); }
+[data-m=air] #armR { transform: rotate(-152deg); }
+[data-m=air] #legL { transform: rotate(-18deg); }
+[data-m=air] #legR { transform: rotate(18deg); }
+
+/* Blaster Discharge Animation */
+@keyframes gunRecoil {
+  0% { transform: translateY(0); }
+  25% { transform: translateX(-8px) scale(0.98); }
+  100% { transform: translateX(0); }
+}
+[data-m=blast] #all { animation: gunRecoil 0.28s ease; }
+[data-m=blast] #armR { transform: rotate(-88deg); } /* Points forward */
+
+/* Eyes & Mouth states */
+#eyesH, #eyesS, #mO, #mH, #mS, .zz, .lap { display: none; }
+#eyesN { transform-box: fill-box; transform-origin: center; animation: naturalBlink 4.5s infinite; }
+@keyframes naturalBlink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  97% { transform: scaleY(0.1); }
+}
+[data-e=happy] #eyesN, [data-e=sleep] #eyesN { display: none; }
+[data-e=happy] #eyesH, [data-e=sleep] #eyesS { display: block; }
+[data-e=happy] #mN, [data-e=surprised] #mN { display: none; }
+[data-e=happy] #mH, [data-e=surprised] #mO { display: block; }
+[data-e=sad] #mN { display: none; }
+[data-e=sad] #mS { display: block; }
+[data-e=surprised] #eyesN { animation: none; transform: scale(1.25); }
+
+[data-m=sleep] .zz {
+  display: block;
+  animation: floatZ 2s linear infinite;
+  font: bold 12px 'Space Mono', monospace;
+  fill: var(--ac);
+}
+@keyframes floatZ {
+  from { transform: translate(0, 6px); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: translate(10px, -18px); opacity: 0; }
+}
+
+/* Tactical Coding Laptop */
+[data-m=work] .lap { display: block; }
+[data-m=work] #all { animation: none; transform: translateY(18px); }
+[data-m=work] #legL { transform: rotate(82deg); }
+[data-m=work] #legR { transform: rotate(-82deg); }
+[data-m=work] #armL, [data-m=work] #armR { animation: legFlail 0.18s ease-in-out infinite alternate; }
+
+/* Interactive Drop Items */
+.item {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  width: 32px;
+  font-size: 28px;
+  line-height: 32px;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+/* Laser Bolts */
+.laser-bolt {
+  position: fixed;
+  height: 4px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 0 12px var(--ac), 0 0 24px var(--ac);
+  z-index: 15;
+  pointer-events: none;
+  transform-origin: left center;
+}
+</style>
+</head>
+<body>
+
+<div id="sky"></div>
+<div id="sky-grid"></div>
+<div id="orb"></div>
+<div id="ceiling-rail"></div>
+<div id="floor"></div>
+
+<!-- Top Navigation -->
+<div class="nav-links">
+  <a href="shimeji-demo.html" class="b" style="color:var(--lime);border-color:var(--lime)">🎬 DEMO REEL</a>
+  <a href="index.html" class="b">◀ SLIDES</a>
+</div>
+
+<!-- Controls Pill Panel -->
+<details id="panel" open>
+  <summary>ANUNAY // SHIMEJI PET</summary>
+  <div id="inner">
+    <div class="r">
+      <span>Name</span>
+      <input type="text" id="name" maxlength="16" value="Anunay" placeholder="Mascot Name">
+    </div>
+    <div class="r">
+      <span>Jacket</span>
+      <select id="jacket-style">
+        <option value="cyber">Synthwave Neon (Official)</option>
+        <option value="stealth">Stealth Black &amp; Cyan</option>
+        <option value="arcade">Retro 80s Arcade</option>
+      </select>
+    </div>
+    <div class="r">
+      <span>Actions</span>
+      <button class="b" data-a="wave">Wave</button>
+      <button class="b" data-a="sit">Sit</button>
+      <button class="b" data-a="sleep">Sleep</button>
+      <button class="b" data-a="jump">🦘 Jump</button>
+      <button class="b" data-a="climb">🧗 Climb</button>
+      <button class="b" data-a="ceiling">🙃 Ceiling</button>
+      <button class="b action-blast" data-a="blast">⚡ Blast</button>
+    </div>
+    <div class="r">
+      <span>Mode</span>
+      <button class="b" id="follow">Follow Cursor</button>
+      <label><input type="checkbox" id="snd" checked> Sound</label>
+    </div>
+    <div class="r" style="margin:4px 0">
+      <span>Food</span>
+      <div class="bar" style="flex:1"><i id="b0"></i></div>
+    </div>
+    <div class="r" style="margin:4px 0">
+      <span>Energy</span>
+      <div class="bar" style="flex:1"><i id="b1"></i></div>
+    </div>
+    <div class="r" style="margin:4px 0">
+      <span>Fun</span>
+      <div class="bar" style="flex:1"><i id="b2"></i></div>
+    </div>
+    <div class="r">
+      <span>Interact</span>
+      <button class="b" id="tf">🍕 Feed</button>
+      <button class="b" id="tb">⚽ Ball</button>
+      <button class="b" data-a="dance">🕺 Dance</button>
+    </div>
+    <div class="r">
+      <span>Focus</span>
+      <select id="fm"><option>15</option><option selected>25</option><option>45</option></select>
+      <button class="b" id="fs">Start</button>
+      <span id="ft" style="min-width:0;font-family:'Space Mono',monospace;color:var(--ac)"></span>
+    </div>
+    <div class="r" style="color:var(--mut);font-size:11px;line-height:1.4">
+      🐾 <b>HOLDING FROM THE HAND:</b> Click &amp; hold Anunay by the hand to pick him up! Flick to throw him across the room!
+    </div>
+  </div>
+</details>
+
+<!-- Mascot Element -->
+<div id="pet" data-m="idle" data-e="normal">
+  <div id="bubble"></div>
+  <div id="lean">
+    <!-- SVG Mascot Canvas with Dedicated Gun on Back and Hand Kinematics -->
+    <svg id="av" viewBox="0 0 100 130" aria-label="Anunay Shimeji Mascot">
+      <defs>
+        <!-- Linear Gradients for Synthwave Cyber Jacket -->
+        <linearGradient id="gradJacket" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e6008b"/>
+          <stop offset="60%" stop-color="#8b28d6"/>
+          <stop offset="100%" stop-color="#3d1b82"/>
+        </linearGradient>
+        <linearGradient id="gradCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00f0ff"/>
+          <stop offset="100%" stop-color="#3df0ff"/>
+        </linearGradient>
+        <linearGradient id="gradRifle" x1="0%" y1="0%" x2="100%" y2="50%">
+          <stop offset="0%" stop-color="#4a5568"/>
+          <stop offset="50%" stop-color="#2d3748"/>
+          <stop offset="100%" stop-color="#1a202c"/>
+        </linearGradient>
+        <pattern id="checkerPattern" width="6" height="6" patternUnits="userSpaceOnUse">
+          <rect width="3" height="3" fill="#f5d300"/>
+          <rect x="3" width="3" height="3" fill="#181a24"/>
+          <rect y="3" width="3" height="3" fill="#181a24"/>
+          <rect x="3" y="3" width="3" height="3" fill="#f5d300"/>
+        </pattern>
+      </defs>
+
+      <!-- Contact Shadow -->
+      <ellipse cx="50" cy="122" rx="28" ry="5" fill="#000" opacity="0.35"/>
+
+      <!-- All Body Parts Root -->
+      <g id="all">
+
+        <!-- ==============================================================
+             1. BLASTER RIFLE ON BACK (Slung diagonally over left shoulder)
+             ============================================================== -->
+        <g id="gun" transform="translate(46, 50) rotate(-34)">
+          <!-- Tactical Rifle Chassis -->
+          <!-- Skeleton Stock -->
+          <path d="M-36 6 L-24 6 L-22 14 L-36 14 Z" fill="#1f242e" stroke="#000" stroke-width="1.8"/>
+          <rect x="-24" y="8" width="10" height="4" fill="#2d3748" stroke="#000" stroke-width="1.2"/>
+          
+          <!-- Receiver & Battery Well -->
+          <rect x="-14" y="4" width="28" height="12" rx="2" fill="url(#gradRifle)" stroke="#000" stroke-width="1.8"/>
+          <!-- Status LEDs (Magenta & Red) -->
+          <rect x="-10" y="6" width="3" height="3" fill="#ff2a85"/>
+          <rect x="-5" y="6" width="3" height="3" fill="#ff4a1c"/>
+          <rect x="0" y="6" width="3" height="3" fill="#d4ff3a"/>
+
+          <!-- Top Picatinny Rail & Holographic Optic Sight -->
+          <rect x="-8" y="0" width="16" height="4" rx="1" fill="#1a202c" stroke="#000" stroke-width="1.2"/>
+          <circle cx="0" cy="2" r="1.2" fill="#3df0ff"/>
+
+          <!-- Dual Barrel & Shroud with Cyan Glowing Power Vents -->
+          <rect x="14" y="5" width="22" height="10" rx="1.5" fill="url(#gradRifle)" stroke="#000" stroke-width="1.8"/>
+          <!-- Heat dissipation vents -->
+          <line x1="18" y1="7" x2="21" y2="13" stroke="#3df0ff" stroke-width="1.5"/>
+          <line x1="23" y1="7" x2="26" y2="13" stroke="#3df0ff" stroke-width="1.5"/>
+          <line x1="28" y1="7" x2="31" y2="13" stroke="#3df0ff" stroke-width="1.5"/>
+          <!-- Dual Muzzle Tips -->
+          <rect x="36" y="6" width="3" height="3" fill="#111" stroke="#000" stroke-width="1"/>
+          <rect x="36" y="11" width="3" height="3" fill="#111" stroke="#000" stroke-width="1"/>
+          <circle cx="39" cy="7.5" r="1" fill="#3df0ff"/>
+          <circle cx="39" cy="12.5" r="1" fill="#3df0ff"/>
+
+          <!-- Pistol Grip -->
+          <path d="M-8 16 L-4 16 L-1 25 L-7 25 Z" fill="#1a202c" stroke="#000" stroke-width="1.4"/>
+        </g>
+
+        <!-- ==============================================================
+             2. LEGS & SNEAKERS
+             ============================================================== -->
+        <!-- Left Leg -->
+        <g id="legL" class="lim">
+          <rect class="pants" x="35" y="78" width="12" height="30" rx="6" fill="#2d3548" stroke="#000" stroke-width="1.6"/>
+          <!-- Knee Seam -->
+          <line x1="36" y1="92" x2="46" y2="92" stroke="#1d2332" stroke-width="1.4"/>
+          <!-- Futuristic High-Top Sneaker -->
+          <ellipse cx="40" cy="111" rx="9" ry="5" fill="#1a1c26" stroke="#000" stroke-width="1.4"/>
+          <rect x="33" y="106" width="13" height="5" fill="#d8009b"/>
+          <!-- Cyan Neon Sole Glow -->
+          <rect x="32" y="113" width="16" height="3.5" rx="1.5" fill="#3df0ff" stroke="#000" stroke-width="1"/>
+        </g>
+
+        <!-- Right Leg -->
+        <g id="legR" class="lim">
+          <rect class="pants" x="53" y="78" width="12" height="30" rx="6" fill="#343e54" stroke="#000" stroke-width="1.6"/>
+          <!-- Knee Seam -->
+          <line x1="54" y1="92" x2="64" y2="92" stroke="#222938" stroke-width="1.4"/>
+          <!-- Futuristic High-Top Sneaker -->
+          <ellipse cx="58" cy="111" rx="9" ry="5" fill="#1a1c26" stroke="#000" stroke-width="1.4"/>
+          <rect x="51" y="106" width="13" height="5" fill="#d8009b"/>
+          <!-- Cyan Neon Sole Glow -->
+          <rect x="50" y="113" width="16" height="3.5" rx="1.5" fill="#3df0ff" stroke="#000" stroke-width="1"/>
+        </g>
+
+        <!-- ==============================================================
+             3. LEFT ARM & SLEEVE (Back Arm)
+             ============================================================== -->
+        <g id="armL" class="lim" style="transform-origin: 27px 55px;">
+          <!-- Sleeve -->
+          <rect class="shirt" x="22" y="55" width="11" height="26" rx="5.5" fill="url(#gradJacket)" stroke="#000" stroke-width="1.8"/>
+          <!-- Yellow Checkerboard Armband -->
+          <rect x="22" y="64" width="11" height="6" fill="url(#checkerPattern)" stroke="#000" stroke-width="1"/>
+          <!-- Purple Ribbed Cuff -->
+          <rect x="22" y="78" width="11" height="4" fill="#8b28d6" stroke="#000" stroke-width="1"/>
+          <!-- Gripping Hand with Magnetic Glove -->
+          <circle class="skin" cx="27.5" cy="86" r="5" fill="#f5c7a1" stroke="#000" stroke-width="1.5"/>
+          <!-- Curled Grip Fingers & Cyan Magnetic Pad -->
+          <circle cx="27.5" cy="86" r="2.2" fill="#3df0ff"/>
+        </g>
+
+        <!-- ==============================================================
+             4. TORSO & SYNTHWAVE BOMBER JACKET
+             ============================================================== -->
+        <!-- Dark Retro Tee -->
+        <rect x="34" y="52" width="32" height="32" rx="6" fill="#141724" stroke="#000" stroke-width="2"/>
+        <!-- Synthwave Horizontal Chest Stripes -->
+        <line x1="38" y1="62" x2="62" y2="62" stroke="#3df0ff" stroke-width="2"/>
+        <line x1="38" y1="66" x2="62" y2="66" stroke="#ff2a85" stroke-width="2"/>
+        <line x1="38" y1="70" x2="62" y2="70" stroke="#f5d300" stroke-width="2"/>
+
+        <!-- Left & Right Open Jacket Panels -->
+        <path d="M34 52 L42 52 L45 82 L34 82 Z" fill="url(#gradJacket)" stroke="#000" stroke-width="1.8"/>
+        <path d="M66 52 L58 52 L55 82 L66 82 Z" fill="url(#gradJacket)" stroke="#000" stroke-width="1.8"/>
+
+        <!-- Glowing Cyan Collar Trim -->
+        <polygon points="34,52 42,50 44,58 35,59" fill="#3df0ff" stroke="#000" stroke-width="1.2"/>
+        <polygon points="66,52 58,50 56,58 65,59" fill="#3df0ff" stroke="#000" stroke-width="1.2"/>
+
+        <!-- Yellow Checkerboard Waistband -->
+        <rect x="34" y="80" width="32" height="6" fill="url(#checkerPattern)" stroke="#000" stroke-width="1.4"/>
+
+        <!-- Tactical Diagonal Sling Strap across chest (holds rifle on back) -->
+        <line x1="38" y1="53" x2="62" y2="81" stroke="#111" stroke-width="5"/>
+        <line x1="38" y1="53" x2="62" y2="81" stroke="#222" stroke-width="3"/>
+        <line x1="38" y1="53" x2="62" y2="81" stroke="#3df0ff" stroke-width="1"/>
+        <!-- Tactical Buckle -->
+        <rect x="47" y="64" width="6" height="6" rx="1" fill="#a0aec0" stroke="#000" stroke-width="1"/>
+        <circle cx="50" cy="67" r="1" fill="#ff4a1c"/>
+
+        <!-- ==============================================================
+             5. ANUNAY HEAD & STYLISH HAIR
+             ============================================================== -->
+        <!-- Neck -->
+        <rect x="45" y="44" width="10" height="10" fill="#e0a878" stroke="#000" stroke-width="1.4"/>
+
+        <!-- Head Base -->
+        <circle class="skin" cx="50" cy="32" r="21" fill="#f5c7a1" stroke="#000" stroke-width="2"/>
+
+        <!-- Anime Cheek Blushes -->
+        <g class="bl">
+          <ellipse cx="36" cy="40" rx="4" ry="2.2" fill="#ff8aa0" opacity="0.45"/>
+          <ellipse cx="64" cy="40" rx="4" ry="2.2" fill="#ff8aa0" opacity="0.45"/>
+        </g>
+
+        <!-- Anunay's Signature Anime Hair -->
+        <!-- Volumetric swept black anime curls -->
+        <path id="hair" class="hair" d="
+          M28 32
+          C22 18, 30 6, 50 7
+          C66 6, 76 17, 72 32
+          C68 20, 60 16, 50 18
+          C40 16, 32 19, 28 32 Z
+          M27 31 L24 40 L30 35 Z
+          M73 31 L76 40 L70 35 Z
+          M40 16 C42 10, 48 10, 52 14 Z
+        " fill="#181a24" stroke="#000" stroke-width="1.8"/>
+
+        <!-- Anime Eyes -->
+        <g id="ey">
+          <!-- Normal Eyes with Focused Gaze -->
+          <g id="eyesN">
+            <ellipse cx="42" cy="32" rx="2.8" ry="3.8" fill="#181a24"/>
+            <ellipse cx="58" cy="32" rx="2.8" ry="3.8" fill="#181a24"/>
+            <!-- Catchlights -->
+            <circle cx="43" cy="30.5" r="1" fill="#fff"/>
+            <circle cx="59" cy="30.5" r="1" fill="#fff"/>
+          </g>
+          <!-- Happy Curved Eyes -->
+          <g id="eyesH" fill="none" stroke="#181a24" stroke-width="2.4" stroke-linecap="round">
+            <path d="M38 33 Q42 27 46 33"/>
+            <path d="M54 33 Q58 27 62 33"/>
+          </g>
+          <!-- Sleeping Closed Eyes -->
+          <g id="eyesS" fill="none" stroke="#181a24" stroke-width="2.4" stroke-linecap="round">
+            <path d="M38 32 Q42 36 46 32"/>
+            <path d="M54 32 Q58 36 62 32"/>
+          </g>
+        </g>
+
+        <!-- Glasses (Thin Dark Frames with Cyber Cyan Edge Reflect) -->
+        <g id="gl" fill="rgba(61, 240, 255, 0.12)" stroke="#181a24" stroke-width="1.8">
+          <circle cx="42" cy="32" r="7.5"/>
+          <circle cx="58" cy="32" r="7.5"/>
+          <line x1="49.5" y1="32" x2="50.5" y2="32"/>
+          <!-- Lens glint -->
+          <line x1="39" y1="28" x2="43" y2="28" stroke="#3df0ff" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="55" y1="28" x2="59" y2="28" stroke="#3df0ff" stroke-width="1.2" stroke-linecap="round"/>
+        </g>
+
+        <!-- Mouth -->
+        <g id="mouth">
+          <!-- Normal Confident Smile -->
+          <path id="mN" d="M45 42 Q50 47 55 42" fill="none" stroke="#7a2e2e" stroke-width="2" stroke-linecap="round"/>
+          <!-- Surprised Open Mouth -->
+          <ellipse id="mO" cx="50" cy="43" rx="3.5" ry="4.5" fill="#7a2e2e"/>
+          <!-- Sad Mouth -->
+          <path id="mS" d="M45 45 Q50 40 55 45" fill="none" stroke="#7a2e2e" stroke-width="2" stroke-linecap="round"/>
+          <!-- Happy Big Smile -->
+          <path id="mH" d="M43 41 Q50 52 57 41 Z" fill="#7a2e2e"/>
+        </g>
+
+        <!-- Sleeping Zs -->
+        <text class="zz" x="68" y="16">Z</text>
+
+        <!-- ==============================================================
+             6. RIGHT ARM & GRIPPING HAND (Primary Holding Hand)
+             ============================================================== -->
+        <g id="armR" class="lim" style="transform-origin: 73px 55px;">
+          <!-- Sleeve -->
+          <rect class="shirt" x="67" y="55" width="11" height="26" rx="5.5" fill="url(#gradJacket)" stroke="#000" stroke-width="1.8"/>
+          <!-- Yellow Checkerboard Armband -->
+          <rect x="67" y="64" width="11" height="6" fill="url(#checkerPattern)" stroke="#000" stroke-width="1"/>
+          <!-- Purple Ribbed Cuff -->
+          <rect x="67" y="78" width="11" height="4" fill="#8b28d6" stroke="#000" stroke-width="1"/>
+          <!-- Gripping Hand with Magnetic Cyber Glove -->
+          <circle class="skin" cx="72.5" cy="86" r="5" fill="#f5c7a1" stroke="#000" stroke-width="1.5"/>
+          <!-- Curled Fingers holding tightly -->
+          <circle cx="72.5" cy="86" r="2.2" fill="#3df0ff"/>
+        </g>
+
+        <!-- Focus Coding Laptop -->
+        <g class="lap">
+          <rect x="36" y="70" width="28" height="15" rx="2" fill="#2d3748" stroke="#000" stroke-width="1.4"/>
+          <circle cx="50" cy="77" r="2.5" fill="#3df0ff"/>
+          <rect x="31" y="85" width="38" height="3" rx="1.5" fill="#1a202c"/>
+        </g>
+
+      </g>
+    </svg>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const pet = $('#pet');
+const av = $('#av');
+const bub = $('#bubble');
+const lean = $('#lean');
+const ey = $('#ey');
+const floor = $('#floor');
+
+const SIZE = 104;
+const PH = 144;
+const rand = a => a[Math.floor(Math.random() * a.length)];
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+let cfg = {
+  name: 'Anunay',
+  style: 'cyber',
+  sound: true
+};
+
+let s = {
+  x: 180,
+  y: 0,
+  vx: 0,
+  vy: 0,
+  dir: 1,
+  m: 'idle',
+  t: 2.5,
+  wall: 0,
+  cd: 1,
+  eo: 0,
+  follow: false,
+  want: false,
+  focus: 0
+};
+
+let ptr = { x: window.innerWidth / 2, y: 0 };
+let FT = 0;
+let drag = null;
+let lastTap = 0;
+let bubbleTimer;
+let audioCtx = null;
+let soundEnabled = true;
+
+function measure() {
+  FT = floor.getBoundingClientRect().top;
+}
+
+function initSound() {
+  if (!audioCtx) {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioCtx();
+    } catch(e){}
+  }
+}
+
+function beep(freq, duration = 0.1, type = 'sine') {
+  if (!soundEnabled) return;
+  initSound();
+  if (!audioCtx) return;
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch(e){}
+}
+
+function setMode(m, duration = 0) {
+  s.m = m;
+  s.t = duration;
+  pet.dataset.m = m;
+}
+
+function say(text, ms = 2400) {
+  bub.textContent = text;
+  bub.classList.add('on');
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => bub.classList.remove('on'), ms);
+}
+
+function hearts() {
+  const i = document.createElement('i');
+  i.className = 'h';
+  i.textContent = '♥';
+  pet.appendChild(i);
+  setTimeout(() => i.remove(), 1000);
+}
+
+function land() {
+  av.classList.remove('sq');
+  void av.offsetWidth;
+  av.classList.add('sq');
+  beep(180, 0.15, 'triangle');
+  setMode(s.focus ? 'work' : 'idle', 1 + Math.random() * 2);
+}
+
+function jump() {
+  if (s.m === 'drag') return;
+  s.vy = 650;
+  beep(480, 0.18, 'sine');
+  setMode('air');
+  say(rand(['Hup!', 'Takeoff!', 'Airborne!']), 1000);
+}
+
+function startClimb(w) {
+  s.wall = w;
+  s.dir = w;
+  s.cd = 1;
+  s.want = false;
+  beep(350, 0.1, 'sawtooth');
+  setMode('climb', 6 + Math.random() * 3);
+  say('Wall scale! 🧗', 1200);
+}
+
+function goClimb() {
+  s.want = true;
+  s.dir = s.x < window.innerWidth / 2 ? -1 : 1;
+  setMode('walk', 40);
+}
+
+function blast() {
+  if (s.m === 'drag') return;
+  setMode('blast', 0.5);
+  say('⚡ CYBER BURST!', 1400);
+  beep(780, 0.25, 'sawtooth');
+
+  // Spawn visual laser bolt
+  const bolt = document.createElement('div');
+  bolt.className = 'laser-bolt';
+  const bx = s.x + (s.dir > 0 ? 80 : 20);
+  const by = FT - s.y - 70;
+  bolt.style.left = bx + 'px';
+  bolt.style.top = by + 'px';
+  bolt.style.width = '60px';
+  document.body.appendChild(bolt);
+
+  let lx = bx;
+  const lvx = s.dir * 28;
+  const boltAnim = setInterval(() => {
+    lx += lvx;
+    bolt.style.left = lx + 'px';
+    if (lx < -100 || lx > window.innerWidth + 100) {
+      clearInterval(boltAnim);
+      bolt.remove();
+    }
+  }, 16);
+}
+
+function react() {
+  const n = cfg.name;
+  say(rand([
+    `I'm ${n}! The Blaster!`,
+    'Blaster secured on my back!',
+    'Grabbed by the hand! Wheee!',
+    'Let\'s scale the walls!',
+    'Tap sky to drop pizza or ball!'
+  ]));
+  hearts();
+  beep(520, 0.14);
+  s.eo = 1.8;
+  setMode('wave', 1.8);
+}
+
+function pickAction() {
+  if (s.follow || s.focus) { s.t = 1; return; }
+  if (s.m === 'sleep' && N.e < 90) { s.t = 4; return; }
+  
+  const r = Math.random();
+  if (r < 0.35) {
+    s.dir = Math.random() < 0.5 ? -1 : 1;
+    setMode('walk', 2.5 + Math.random() * 4);
+  } else if (r < 0.52) {
+    setMode('idle', 1.5 + Math.random() * 2);
+  } else if (r < 0.65) {
+    setMode('sit', 3 + Math.random() * 3);
+  } else if (r < 0.76) {
+    setMode('wave', 2);
+    s.eo = 2;
+  } else if (r < 0.84) {
+    jump();
+  } else if (r < 0.90) {
+    blast();
+  } else if (r < 0.95) {
+    setMode('sleep', 7 + Math.random() * 4);
+    say('zzz… charging…', 2500);
+  } else {
+    goClimb();
+  }
+}
+
+function update(dt) {
+  const maxX = window.innerWidth - SIZE;
+  if (s.eo > 0) s.eo -= dt;
+  needs(dt);
+  updateItems(dt);
+
+  if (s.m === 'drag') return; // Handled in pointermove
+
+  // Cursor following
+  if (s.follow && ['idle', 'walk', 'sit', 'wave', 'sleep'].includes(s.m)) {
+    const dx = ptr.x - (s.x + SIZE / 2);
+    if (Math.abs(dx) > 70) {
+      s.dir = Math.sign(dx);
+      if (s.m !== 'walk') setMode('walk', 1);
+    } else if (s.m === 'walk') {
+      setMode('idle', 1);
+    }
+  }
+
+  chase();
+
+  if (s.m === 'walk') {
+    s.x += s.dir * (s.follow || s.targetItem ? 130 : 80) * dt;
+    if (s.x <= 0 || s.x >= maxX) {
+      if (!s.follow && (s.want || Math.random() < 0.45)) {
+        startClimb(s.x <= 0 ? -1 : 1);
+      } else {
+        s.x = clamp(s.x, 0, maxX);
+        s.dir *= -1;
+      }
+    }
+  } else if (s.m === 'air') {
+    s.vy -= 1400 * dt;
+    s.y += s.vy * dt;
+    s.x += s.vx * dt;
+    if (s.x < 0 || s.x > maxX) {
+      s.vx *= -0.6;
+      s.x = clamp(s.x, 0, maxX);
+    }
+    if (s.y <= 0) {
+      s.y = 0;
+      s.vy = 0;
+      s.vx = 0;
+      land();
+    }
+  } else if (s.m === 'climb') {
+    s.x = s.wall < 0 ? -15 : maxX + 15;
+    s.dir = s.wall;
+    s.y += 65 * s.cd * dt;
+
+    // Reach top ceiling rail -> crawl onto ceiling!
+    if (s.y >= window.innerHeight - 80) {
+      s.y = window.innerHeight - 80;
+      setMode('ceiling', 6 + Math.random() * 4);
+      say('🙃 Ceiling hang!', 1500);
+      s.cd = -1;
+      return;
+    }
+
+    if (s.y <= 0 && s.cd < 0) {
+      s.y = 0;
+      s.dir = -s.wall;
+      setMode('idle', 1.5);
+    } else {
+      s.t -= dt;
+      if (s.t <= 0) {
+        say('Drop down!', 1000);
+        s.vy = 0;
+        setMode('air');
+      }
+    }
+    return;
+  } else if (s.m === 'ceiling') {
+    // Hanging from ceiling rail
+    s.y = window.innerHeight - 80;
+    s.x += s.dir * 60 * dt;
+    if (s.x < 20 || s.x > maxX - 20) {
+      s.dir *= -1;
+    }
+    s.t -= dt;
+    if (s.t <= 0) {
+      say('Letting go!', 1000);
+      s.vy = 0;
+      setMode('air');
+    }
+    return;
+  }
+
+  if (s.m !== 'air') {
+    s.x = clamp(s.x, 0, maxX);
+    s.t -= dt;
+    if (s.t <= 0) pickAction();
+  }
+}
+
+function render() {
+  pet.style.transform = `translate(${s.x}px, ${-s.y}px) scaleX(${s.dir})`;
+  
+  // Natural body lean / inertia tilt
+  let targetLean = 0;
+  if (s.m === 'walk') {
+    targetLean = 6;
+  } else if (s.m === 'drag' && drag) {
+    targetLean = clamp(drag.vx * 0.14 * s.dir, -28, 28);
+  } else if (s.m === 'climb') {
+    targetLean = -4; // Subtle forward grip lean into wall
+  } else if (s.m === 'ceiling') {
+    targetLean = 180;
+  }
+  lean.style.transform = `rotate(${targetLean}deg)`;
+
+  // Facial Expression state
+  const exp = (s.eo > 0) ? 'happy' :
+    ({ sleep: 'sleep', air: 'surprised', drag: 'surprised', blast: 'happy', dance: 'happy' }[s.m] ||
+    (Math.min(N.h, N.e, N.f) < 25 ? 'sad' : 'normal'));
+  if (pet.dataset.e !== exp) pet.dataset.e = exp;
+
+  // Eye tracking cursor
+  const headY = FT - s.y - PH + 40;
+  ey.style.transform = `translate(${clamp((ptr.x - s.x - 50) / 50, -2.5, 2.5)}px, ${clamp((ptr.y - headY) / 50, -1.8, 1.8)}px)`;
+}
+
+let lastTime = performance.now();
+function gameLoop(now) {
+  const dt = Math.min(0.05, (now - lastTime) / 1000);
+  lastTime = now;
+  update(dt);
+  render();
+  requestAnimationFrame(gameLoop);
+}
+
+window.addEventListener('resize', measure);
+window.addEventListener('pointermove', e => {
+  ptr.x = e.clientX;
+  ptr.y = e.clientY;
+});
+
+// ==============================================================
+// HOLDING FROM THE HAND (DRAG & FLING PHYSICS)
+// ==============================================================
+pet.addEventListener('pointerdown', e => {
+  pet.setPointerCapture(e.pointerId);
+  initSound();
+  drag = {
+    startX: e.clientX,
+    startY: e.clientY,
+    prevX: e.clientX,
+    prevY: e.clientY,
+    vx: 0,
+    vy: 0,
+    moved: false,
+    prevMode: s.m
+  };
+});
+
+pet.addEventListener('pointermove', e => {
+  if (!drag) return;
+
+  const dx = e.clientX - drag.startX;
+  const dy = e.clientY - drag.startY;
+
+  if (!drag.moved && Math.hypot(dx, dy) > 6) {
+    drag.moved = true;
+    setMode('drag');
+    say('Held by the hand! 🐾', 1600);
+    beep(640, 0.12, 'sine');
+  }
+
+  if (drag.moved) {
+    // Velocity tracking for fling inertia
+    drag.vx = (e.clientX - drag.prevX) * 22;
+    drag.vy = (drag.prevY - e.clientY) * 22;
+    drag.prevX = e.clientX;
+    drag.prevY = e.clientY;
+
+    // HOLDING FROM THE HAND:
+    // The cursor holds Anunay directly by his raised right hand!
+    // Hand in SVG is at X ~ 73px, Y ~ 10px from top.
+    const handOffsetX = 73;
+    const handOffsetY = 12;
+
+    s.x = clamp(e.clientX - handOffsetX, 0, window.innerWidth - SIZE);
+    s.y = Math.max(0, FT - (e.clientY + PH - handOffsetY));
+  }
+});
+
+pet.addEventListener('pointerup', () => {
+  if (!drag) return;
+  const d = drag;
+  drag = null;
+
+  if (d.moved) {
+    // FLING / THROW INERTIA!
+    s.vx = clamp(d.vx, -600, 600);
+    s.vy = clamp(d.vy, -200, 850);
+    setMode('air');
+    beep(520, 0.18, 'triangle');
+    say(Math.hypot(s.vx, s.vy) > 300 ? '🚀 WHOOOOOOSH!' : 'Wheee!', 1200);
+    return;
+  }
+
+  if (d.prevMode === 'work') {
+    say(`Shh, we're in focus session!`);
+    return;
+  }
+  if (d.prevMode === 'sleep') {
+    say('Yawn… you woke me up!');
+  }
+
+  // Tap or Double-tap
+  const now = Date.now();
+  setMode('idle', 1);
+  if (now - lastTap < 380) {
+    jump();
+  } else {
+    react();
+  }
+  lastTap = now;
+});
+
+pet.addEventListener('pointercancel', () => {
+  if (drag && drag.moved) {
+    s.vy = 0;
+    setMode('air');
+  }
+  drag = null;
+});
+
+// UI Actions
+document.querySelectorAll('[data-a]').forEach(b => {
+  b.onclick = () => {
+    const a = b.dataset.a;
+    if (s.m === 'drag' || s.focus) return;
+    if (a === 'wave') { setMode('wave', 2.5); s.eo = 2.5; beep(440, 0.15); }
+    else if (a === 'sit') { setMode('sit', 6); beep(330, 0.15); }
+    else if (a === 'sleep') { setMode('sleep', 10); say('zzz…', 2500); beep(220, 0.2); }
+    else if (a === 'jump') { if (s.m === 'climb' || s.m === 'ceiling') setMode('idle'); jump(); }
+    else if (a === 'ceiling') { setMode('ceiling', 8); say('🙃 Hanging from ceiling rail!', 1800); }
+    else if (a === 'blast') { blast(); }
+    else if (a === 'dance') { dance(); }
+    else { goClimb(); }
+  };
+});
+
+$('#follow').onclick = e => {
+  s.follow = !s.follow;
+  e.target.classList.toggle('on', s.follow);
+  if (!s.follow) {
+    setMode('idle', 1);
+  } else {
+    say('Right behind you!', 1500);
+    beep(580, 0.15);
+  }
+};
+
+$('#snd').onchange = e => {
+  soundEnabled = e.target.checked;
+  if (soundEnabled) beep(700, 0.1);
+};
+
+// ==============================================================
+// NEEDS & INTERACTIVE OBJECTS (FOOD & BALL)
+// ==============================================================
+const N = { h: 80, e: 85, f: 80 };
+let itemsList = [];
+let activeTool = null;
+let focusTimer = null;
+
+function needs(dt) {
+  const isSleeping = s.m === 'sleep';
+  N.h -= dt * 0.35;
+  N.f -= dt * 0.30;
+  N.e += isSleeping ? dt * 2.2 : -dt * 0.22;
+  for (const k in N) N[k] = clamp(N[k], 0, 100);
+
+  $('#b0').style.width = N.h + '%';
+  $('#b1').style.width = N.e + '%';
+  $('#b2').style.width = N.f + '%';
+
+  if (N.e < 14 && !s.focus && ['idle', 'walk', 'sit'].includes(s.m)) {
+    setMode('sleep', 8);
+    say('Battery low… recharging…', 2200);
+  }
+}
+
+function dropItem(type, clientX) {
+  if (itemsList.length > 5) {
+    itemsList.shift().el.remove();
+  }
+  const el = document.createElement('div');
+  el.className = 'item';
+  el.textContent = type === 'f' ? rand(['🍕', '🍙', '⚡', '🍩', '🍔', '🍪']) : '⚽';
+  document.body.appendChild(el);
+
+  beep(type === 'f' ? 520 : 440, 0.08);
+
+  itemsList.push({
+    el,
+    type,
+    x: clamp(clientX, 20, window.innerWidth - 20),
+    y: Math.min(FT - 40, 420),
+    vy: 0,
+    vx: (Math.random() - 0.5) * 80,
+    landed: false
+  });
+}
+
+function updateItems(dt) {
+  itemsList.forEach(item => {
+    item.vy -= 1400 * dt;
+    item.y += item.vy * dt;
+    item.x += item.vx * dt;
+
+    if (item.y <= 0) {
+      item.y = 0;
+      if (item.type === 'b' && Math.abs(item.vy) > 120) {
+        item.vy = -item.vy * 0.55;
+        beep(320, 0.06);
+      } else {
+        item.vy = 0;
+        item.landed = true;
+        item.vx *= (1 - 2.5 * dt);
+      }
+    }
+
+    if (item.x < 16 || item.x > window.innerWidth - 16) {
+      item.vx = -item.vx;
+      item.x = clamp(item.x, 16, window.innerWidth - 16);
+    }
+
+    item.el.style.transform = `translate(${item.x - 16}px, ${FT - item.y - 30}px)`;
+  });
+}
+
+function eatItem(item) {
+  itemsList = itemsList.filter(o => o !== item);
+  item.el.remove();
+  setMode('sit', 1.8);
+  s.eo = 1.8;
+  N.h = Math.min(100, N.h + 35);
+  N.f = Math.min(100, N.f + 10);
+  hearts();
+  beep(660, 0.15);
+  say(rand(['Yum!', 'Power recharged!', 'Delicious!']), 1400);
+}
+
+function kickBall(item) {
+  const now = performance.now();
+  if (now - (item.lastKick || 0) < 550) return;
+  item.lastKick = now;
+  item.vy = 420;
+  item.vx = s.dir * 320;
+  item.landed = false;
+  N.f = Math.min(100, N.f + 12);
+  s.eo = 0.8;
+  beep(520, 0.1, 'triangle');
+  say('GOAL! ⚽', 1000);
+}
+
+function chase() {
+  s.targetItem = null;
+  if (s.follow || !['idle', 'walk', 'sit', 'wave', 'sleep'].includes(s.m) || (s.m === 'sleep' && N.e < 35)) return;
+
+  const food = itemsList.find(i => i.type === 'f' && i.landed);
+  const ball = itemsList.find(i => i.type === 'b');
+  const target = (N.h < 90 && food) || ball;
+  if (!target) return;
+
+  s.targetItem = target;
+  const dx = target.x - (s.x + SIZE / 2);
+  if (Math.abs(dx) > 38) {
+    s.dir = Math.sign(dx);
+    if (s.m !== 'walk') setMode('walk', 1);
+  } else if (target.type === 'f') {
+    eatItem(target);
+  } else {
+    kickBall(target);
+  }
+}
+
+function dance() {
+  if (s.focus) return;
+  setMode('wave', 8);
+  s.eo = 8;
+  N.f = Math.min(100, N.f + 25);
+  say('♪ SYNTHWAVE BEAT ♪', 2400);
+  let k = 0;
+  const notes = [440, 554, 659, 880, 659, 554];
+  const danceInterval = setInterval(() => {
+    if (s.m !== 'wave' || k > 12) return clearInterval(danceInterval);
+    beep(notes[k++ % notes.length], 0.12, 'sawtooth');
+  }, 350);
+}
+
+// Focus Pomodoro
+function stopFocus(completed) {
+  clearInterval(focusTimer);
+  s.focus = 0;
+  $('#fs').textContent = 'Start';
+  $('#ft').textContent = '';
+  if (s.m === 'work') setMode('idle', 1);
+  if (completed) {
+    say('Session complete! Amazing focus! 🏆', 4000);
+    N.f = 100;
+    dance();
+  }
+}
+
+$('#fs').onclick = () => {
+  if (s.focus) return stopFocus(false);
+  let timeLeft = $('#fm').value * 60;
+  const halfTime = Math.floor(timeLeft / 2);
+  s.focus = 1;
+  s.y = 0;
+  setMode('work', 1);
+  $('#fs').textContent = 'Stop';
+  say(`Coding session started! 💻`, 2200);
+  beep(520, 0.2);
+
+  focusTimer = setInterval(() => {
+    timeLeft--;
+    $('#ft').textContent = Math.floor(timeLeft / 60) + ':' + String(timeLeft % 60).padStart(2, '0');
+    if (timeLeft === halfTime) say('Halfway there! Keep going!', 2500);
+    if (timeLeft <= 0) stopFocus(true);
+  }, 1000);
+};
+
+// Tool selection (Feed / Ball)
+['tf', 'tb'].forEach(id => {
+  $('#' + id).onclick = () => {
+    const t = id === 'tf' ? 'f' : 'b';
+    activeTool = activeTool === t ? null : t;
+    $('#tf').classList.toggle('on', activeTool === 'f');
+    $('#tb').classList.toggle('on', activeTool === 'b');
+    document.body.style.cursor = activeTool ? 'crosshair' : '';
+  };
+});
+
+[$('#sky'), floor].forEach(el => {
+  el.addEventListener('pointerdown', e => {
+    if (activeTool) dropItem(activeTool, e.clientX);
+  });
+});
+
+// Sky Day / Night Cycle
+function updateSky() {
+  const d = new Date();
+  const hour = d.getHours() + d.getMinutes() / 60;
+  const isDay = hour >= 6 && hour < 18;
+  const progress = isDay ? (hour - 6) / 12 : ((hour + 6) % 24) / 12;
+
+  const palettes = hour < 5.5 || hour >= 19.5
+    ? ['#0a0b16', '#141732']
+    : hour < 8
+    ? ['#2a1638', '#ff4a1c']
+    : hour < 17
+    ? ['#12183c', '#202a5c']
+    : ['#1c102a', '#ff2a85'];
+
+  $('#sky').style.background = `linear-gradient(${palettes[0]}, ${palettes[1]})`;
+  const orb = $('#orb');
+  orb.textContent = isDay ? '☀️' : '🌙';
+  orb.style.left = (progress * 86 + 5) + '%';
+  orb.style.top = (65 - Math.sin(progress * Math.PI) * 48) + '%';
+}
+updateSky();
+setInterval(updateSky, 60000);
+
+// Initialize
+measure();
+const hr = new Date().getHours();
+const greeting = hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening';
+say(`${greeting}! I'm Anunay. Drag me by the hand, fling me, or let's climb! 🐾`, 4000);
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>

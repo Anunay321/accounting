@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Anunay 2D Model | The Blaster Action Arena</title>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #07070f;
+      --paper: #efeadf;
+      --cyan: #3df0ff;
+      --lime: #d4ff3a;
+      --purple: #5b3cff;
+      --orange: #ff4a1c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Space Mono', monospace;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Arena Canvas */
+    #arena {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 40%, #161036 0%, #07070f 75%);
+    }
+
+    /* Minimal Arranged Top HUD */
+    .top-hud {
+      position: fixed;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hud-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: auto;
+    }
+    .hud-tag {
+      background: var(--cyan);
+      color: #000;
+      font: 700 11px/1 'Space Mono', monospace;
+      padding: 5px 10px;
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0 #000;
+    }
+    .hud-title {
+      font: 400 clamp(16px, 3vw, 24px)/1 'Archivo Black', Impact, sans-serif;
+      color: #fff;
+      letter-spacing: -0.02em;
+      text-shadow: 2px 2px 0 #000;
+    }
+
+    /* Sleek Arranged Control Dock */
+    .dock {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(7, 7, 15, 0.92);
+      border: 3px solid var(--paper);
+      box-shadow: 6px 6px 0 #000;
+      padding: 8px 16px;
+      backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+    .dock-pill {
+      background: #000;
+      color: var(--paper);
+      border: 2px solid #333;
+      padding: 6px 14px;
+      font: 700 11px 'Space Mono', monospace;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dock-pill:hover {
+      background: var(--cyan);
+      color: #000;
+      border-color: #000;
+      transform: translateY(-2px);
+      box-shadow: 3px 3px 0 #000;
+    }
+    .dock-pill.active {
+      background: var(--lime);
+      color: #000;
+      border-color: #000;
+      box-shadow: 2px 2px 0 var(--cyan);
+    }
+    .back-btn {
+      text-decoration: none;
+      background: var(--orange);
+      color: #000;
+      border-color: #000;
+      font-weight: 700;
+    }
+    .back-btn:hover {
+      background: var(--lime);
+    }
+
+    /* Hint banner */
+    .hint-banner {
+      position: fixed;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(61, 240, 255, 0.4);
+      padding: 4px 12px;
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: 0.06em;
+      pointer-events: none;
+      z-index: 10;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-hud">
+    <div class="hud-title-wrap">
+      <span class="hud-tag">2D ACTION ARENA</span>
+      <h1 class="hud-title">ANUNAY // THE BLASTER</h1>
+    </div>
+    <div style="pointer-events:auto;display:flex;gap:8px">
+      <a href="shimeji-demo.html" class="dock-pill" style="color:var(--lime,#d4ff3a);border-color:var(--lime,#d4ff3a)">🎬 DEMO REEL</a>
+      <a href="index.html" class="dock-pill back-btn">◀ SLIDES</a>
+    </div>
+  </div>
+
+  <div class="hint-banner">
+    🐾 SHIMEJI PET: CLICK &amp; DRAG ANUNAY TO THROW HIM! · CLIMBS WALLS &amp; CEILING · ARROWS TO MOVE · S TO SLIDE
+  </div>
+
+  <canvas id="arena"></canvas>
+
+  <div class="dock">
+    <button class="dock-pill active" id="btn-auto">🤖 AUTO: ON</button>
+    <button class="dock-pill" id="btn-jump">🦘 JUMP</button>
+    <button class="dock-pill" id="btn-slide">🛹 SLIDE</button>
+    <button class="dock-pill" id="btn-toss">🐾 TOSS</button>
+    <button class="dock-pill" id="btn-shoot">⚡ BLAST BURST</button>
+    <button class="dock-pill active" id="btn-sound">🔊 SOUND</button>
+  </div>
+
+  <script src="anunay-2d.js"></script>
+  <script>
+    const canvas = document.getElementById('arena');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      if (window.anunay) {
+        window.anunay.groundY = canvas.height - 75;
+      }
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Initialize 2D Anunay in Standalone Arena Mode
+    const anunay = new Anunay2D(canvas, {
+      scale: 0.65,
+      groundY: canvas.height - 75,
+      isStandalone: true,
+      autonomous: true
+    });
+    window.anunay = anunay;
+
+    // Controls
+    const autoBtn = document.getElementById('btn-auto');
+    autoBtn.addEventListener('click', () => {
+      anunay.autonomous = !anunay.autonomous;
+      autoBtn.classList.toggle('active', anunay.autonomous);
+      autoBtn.textContent = anunay.autonomous ? '🤖 AUTO: ON' : '🎮 MANUAL';
+    });
+
+    document.getElementById('btn-jump').addEventListener('click', () => {
+      anunay.triggerJump();
+    });
+
+    document.getElementById('btn-slide').addEventListener('click', () => {
+      anunay.triggerSlide();
+    });
+
+    document.getElementById('btn-toss').addEventListener('click', () => {
+      anunay.surface = 'air';
+      anunay.vy = -16;
+      anunay.vx = (Math.random() - 0.5) * 14;
+      anunay.triggerJump();
+    });
+
+    document.getElementById('btn-shoot').addEventListener('click', () => {
+      anunay.triggerShootBurst();
+    });
+
+    const soundBtn = document.getElementById('btn-sound');
+    soundBtn.addEventListener('click', () => {
+      anunay.soundEnabled = !anunay.soundEnabled;
+      soundBtn.classList.toggle('active', anunay.soundEnabled);
+      soundBtn.textContent = anunay.soundEnabled ? '🔊 SOUND' : '🔇 MUTED';
+    });
+
+    // Floor Grid Backdrop Render
+    function drawBackground() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const ground = canvas.height - 75;
+
+      // Stars
+      ctx.fillStyle = '#ffffff';
+      for (let s = 0; s < 45; s++) {
+        const sx = ((s * 137.5) % w);
+        const sy = ((s * 93.1) % (ground - 60));
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+
+      // Neon Cyber Grid Floor
+      ctx.strokeStyle = '#5b3cff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, ground);
+      ctx.lineTo(w, ground);
+      ctx.stroke();
+
+      // Top glowing edge
+      ctx.strokeStyle = '#3df0ff';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#3df0ff';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.moveTo(0, ground);
+      ctx.lineTo(w, ground);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Perspective floor lines
+      ctx.strokeStyle = 'rgba(91, 60, 255, 0.35)';
+      ctx.lineWidth = 1.5;
+      const step = 40;
+      for (let x = 0; x < w; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, ground);
+        ctx.lineTo(x + (x - w / 2) * 0.45, h);
+        ctx.stroke();
+      }
+    }
+
+    // Main Game Loop
+    let lastTime = performance.now();
+    function loop(now) {
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBackground();
+
+      anunay.update(dt);
+      anunay.render();
+
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
